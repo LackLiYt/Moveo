@@ -43,6 +43,3 @@ flutter {
     source = "../.."
 }
 
-repositories {
-    mavenCentral()
-}

@@ -67,8 +67,8 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(
                   color: Color(0xFF0437F2),
                   fontSize: 72,
-                  fontFamily: 'Arial Rounded MT Bold',
-                  fontWeight: FontWeight.w400,
+                  fontFamily: 'Montserrat Bold',
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

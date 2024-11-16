@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
                 : const LoginPage(),
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: const Color(0xFFE91052),
+            primary: const Color(0xFF0437F2),
           ),
         ));
   }
