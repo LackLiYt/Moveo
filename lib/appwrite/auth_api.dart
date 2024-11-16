@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:coolapp/constants/constants.dart';
+import 'package:moveo/constants/constants.dart';
 import 'package:flutter/widgets.dart';
 
 enum AuthStatus {
