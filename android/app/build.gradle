@@ -1,62 +1,48 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // Ensure the Flutter Gradle Plugin is applied after Android and Kotlin plugins.
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
 
 android {
-    namespace = "com.example.moveo"
+    namespace = "com.example.coolapp"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "25.1.8937393"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17 // Updated to use Java 17 for modern compatibility
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
+<<<<<<< HEAD
         jvmTarget = JavaVersion.VERSION_17 // Ensure compatibility with Java 17
+=======
+        jvmTarget = JavaVersion.VERSION_1_8
+>>>>>>> parent of c42ebf2 (Додав частину аутентифікації + Вані логін та сайнін без функцій)
     }
 
     defaultConfig {
-        applicationId = "com.example.moveo"
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId = "com.example.coolapp"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        // Configure multidex if needed
-        multiDexEnabled true
     }
 
     buildTypes {
         release {
-            // Add proguard if needed for release builds
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
-            shrinkResources false
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-
-    packagingOptions {
-        // Fix issues with duplicate files in dependencies
-        exclude "META-INF/DEPENDENCIES"
-        exclude "META-INF/LICENSE"
-        exclude "META-INF/LICENSE.txt"
-        exclude "META-INF/NOTICE"
-        exclude "META-INF/NOTICE.txt"
-        exclude "META-INF/AL2.0"
-        exclude "META-INF/LGPL2.1"
     }
 }
 
 flutter {
     source = "../.."
-}
-
-// Add this to ensure compatibility with multidex if necessary
-dependencies {
-    implementation "androidx.multidex:multidex:2.0.1"
 }
