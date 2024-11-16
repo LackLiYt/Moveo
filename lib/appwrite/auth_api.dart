@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
 import 'package:moveo/constants/constants.dart';
 import 'package:flutter/widgets.dart';
@@ -17,7 +18,7 @@ class AuthAPI extends ChangeNotifier {
 
   AuthStatus _status = AuthStatus.uninitialized;
 
-  //Отримання методів
+  // Getters
   User get currentUser => _currentUser;
   AuthStatus get status => _status;
   String? get username => _currentUser.name;
@@ -76,16 +77,17 @@ class AuthAPI extends ChangeNotifier {
     }
   }
 
-  // signInWithProvider({required String provider}) async {
-  // try {
-  //  final session = await account.createOAuth2Session(provider: provider);
-  // _currentUser = await account.get();
-  // _status = AuthStatus.authenticated;
-  // return session;
-  // } finally {
-  //  notifyListeners();
-  // }
-  // }
+  signInWithProvider({required String provider}) async {
+    try {
+      final session =
+          await account.createOAuth2Session(provider: _mapProvider(provider));
+      _currentUser = await account.get();
+      _status = AuthStatus.authenticated;
+      return session;
+    } finally {
+      notifyListeners();
+    }
+  }
 
   signOut() async {
     try {
@@ -102,5 +104,20 @@ class AuthAPI extends ChangeNotifier {
 
   updatePereferences({required String bio}) async {
     return account.updatePrefs(prefs: {'bio': bio});
+  }
+
+  // Helper to map provider string to OAuthProvider
+  OAuthProvider _mapProvider(String provider) {
+    switch (provider.toLowerCase()) {
+      case 'google':
+        return OAuthProvider.google;
+      case 'github':
+        return OAuthProvider.github;
+      case 'facebook':
+        return OAuthProvider.facebook;
+      // Add other providers as needed
+      default:
+        throw ArgumentError('Unsupported provider: $provider');
+    }
   }
 }

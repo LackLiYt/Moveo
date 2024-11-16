@@ -1,21 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:moveo/pages/signup_page.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:appwrite/appwrite.dart';
+import 'package:moveo/appwrite/auth_api.dart';
 import 'package:moveo/pages/forgotpassword_page.dart';
+import 'package:moveo/pages/signup_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final emailTextController = TextEditingController();
+  final passwordTextController = TextEditingController();
+
+  signIn() async {
+    try {
+      final AuthAPI appwrite = context.read<AuthAPI>();
+      await appwrite.createEmailSession(
+        email: emailTextController.text,
+        password: passwordTextController.text,
+      );
+    } on AppwriteException catch (e) {
+      _showAlert(title: 'Login failed', text: e.message.toString());
+    }
+  }
+
+  void _showAlert({required String title, required String text}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(text),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(55),
         ),
         child: Stack(
           children: [
-            Positioned(
+            const Positioned(
               left: 73,
               top: 100,
               child: Text(
@@ -36,41 +80,41 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 children: [
                   TextField(
+                    controller: emailTextController,
                     decoration: InputDecoration(
                       hintText: 'phone number, mail',
-                      hintStyle: TextStyle(color: Color(0xFF969090)),
+                      hintStyle: const TextStyle(color: Color(0xFF969090)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Color(0xFFE0E0E5)),
+                        borderSide: const BorderSide(color: Color(0xFFE0E0E5)),
                       ),
                       filled: true,
-                      fillColor: Color(0xFFEFF2F5),
+                      fillColor: const Color(0xFFEFF2F5),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
+                    controller: passwordTextController,
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: 'password',
-                      hintStyle: TextStyle(color: Color(0xFF969090)),
+                      hintStyle: const TextStyle(color: Color(0xFF969090)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Color(0xFFE0E0E5)),
+                        borderSide: const BorderSide(color: Color(0xFFE0E0E5)),
                       ),
                       filled: true,
-                      fillColor: Color(0xFFEFF2F5),
+                      fillColor: const Color(0xFFEFF2F5),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ForgotPasswordPage()),
-                      );
-                    },
-                    child: Text(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ForgotPasswordPage()),
+                    ),
+                    child: const Text(
                       'Forgot password?',
                       style: TextStyle(
                         color: Color(0xFF0437F2),
@@ -80,44 +124,38 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      // Додайте функціонал для логіну
-                    },
+                    onPressed: signIn,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(
-                          0xFF0437F2), // Заміна primary на backgroundColor
+                      backgroundColor: const Color(0xFF0437F2),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      minimumSize: Size(double.infinity, 40),
+                      minimumSize: const Size(double.infinity, 40),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Log in',
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Don`t have an account?',
+                      const Text(
+                        'Don’t have an account?',
                         style: TextStyle(
                           color: Color(0xFF969090),
                           fontSize: 14,
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SignUpPage()),
-                          );
-                        },
-                        child: Text(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUpPage()),
+                        ),
+                        child: const Text(
                           'Sign up',
                           style: TextStyle(
                             color: Color(0xFF0437F2),

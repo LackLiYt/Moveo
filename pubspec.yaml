@@ -14,6 +14,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.10+1
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:
@@ -25,7 +26,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icons/
+    - assets/google_icon.svg
+    - assets/apple_icon.svg
+    - assets/github_icon.svg
+    - assets/twitter_icon.svg
 
   fonts:
     - family: Poppins
