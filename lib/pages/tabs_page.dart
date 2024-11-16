@@ -27,7 +27,7 @@ class _TabsPageState extends State<TabsPage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.message_outlined), label: "Messages"),
+              icon: Icon(Icons.message_outlined), label: "Home"),
           BottomNavigationBarItem(
               icon: Icon(Icons.account_circle_outlined), label: "Account")
         ],

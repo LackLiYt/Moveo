@@ -67,8 +67,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 style: TextStyle(
                   color: Color(0xFF0437F2),
                   fontSize: 72,
-                  fontFamily: 'Arial Rounded MT Bold',
-                  fontWeight: FontWeight.w400,
+                  fontFamily: 'Montserrat-Bold',
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -91,7 +91,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       fillColor: const Color(0xFFEFF2F5),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: passwordTextController,
                     obscureText: true,
@@ -121,7 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 405),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
