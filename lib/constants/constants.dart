@@ -3,3 +3,4 @@ const String APPWRITE_URL = "https://cloud.appwrite.io/v1";
 
 const String APPWRITE_DATABASE_ID = "6717aac9002fc50506d7";
 const String COLLECTION_MESSAGES = "673796160022761894a5";
+const String COLLECTION_USER_ID = "673c7cc000250c69bc67";

@@ -1,5 +1,6 @@
 import 'package:moveo/pages/account_page.dart';
 import 'package:moveo/pages/messages_page.dart';
+import 'package:moveo/pages/post_page.dart';
 import 'package:flutter/material.dart';
 
 class TabsPage extends StatefulWidget {
@@ -12,7 +13,7 @@ class TabsPage extends StatefulWidget {
 class _TabsPageState extends State<TabsPage> {
   int _selectedIndex = 0;
 
-  static const _widgets = [MessagesPage(), AccountPage()];
+  static const _widgets = [MessagesPage(), PostPage(), AccountPage()];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -29,7 +30,9 @@ class _TabsPageState extends State<TabsPage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.message_outlined), label: "Home"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle_outlined), label: "Account")
+              icon: Icon(Icons.add_a_photo), label: "New Post"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle_outlined), label: "Account"),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
