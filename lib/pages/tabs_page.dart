@@ -1,6 +1,6 @@
-import 'package:moveo/pages/account_page.dart';
-import 'package:moveo/pages/messages_page.dart';
-import 'package:moveo/pages/post_page.dart';
+import 'package:moveo/pages/main_pages/account_page.dart';
+import 'package:moveo/pages/main_pages/messages_page.dart';
+import 'package:moveo/pages/main_pages/post_page.dart';
 import 'package:flutter/material.dart';
 
 class TabsPage extends StatefulWidget {

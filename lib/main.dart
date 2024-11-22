@@ -1,4 +1,4 @@
-import 'package:moveo/pages/login_page.dart';
+import 'package:moveo/pages/login/login_page.dart';
 import 'package:moveo/pages/tabs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

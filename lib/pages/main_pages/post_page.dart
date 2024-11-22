@@ -44,59 +44,19 @@ class _PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text(
-            'New Post',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Montserrat',
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          'New post',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
-                signOut();
-              },
-            ),
-          ],
         ),
-        body: Center(
-          child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('Welcome back $username!',
-                      style: Theme.of(context).textTheme.headlineSmall),
-                  Text('$email'),
-                  const SizedBox(height: 40),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(children: [
-                        TextField(
-                          controller: bioTextController,
-                          decoration: const InputDecoration(
-                            labelText: 'Your Bio',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: () => savePreferences(),
-                          child: const Text('Save Preferences'),
-                        ),
-                      ]),
-                    ),
-                  )
-                ],
-              )),
-        ));
+      ),
+    );
   }
 }

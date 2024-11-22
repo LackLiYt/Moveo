@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:moveo/appwrite/auth_api.dart';
 import 'package:moveo/pages/forgotpassword_page.dart';
-import 'package:moveo/pages/signup_page.dart';
+import 'package:moveo/pages/login/signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
