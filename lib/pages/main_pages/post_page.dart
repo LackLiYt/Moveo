@@ -57,49 +57,40 @@ class _PostPageState extends State<PostPage> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.center, // Centering all children horizontally
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Main Camera and Selfie Camera Section
             if (_isCameraInitialized)
               Stack(
                 children: [
-                  // Main Camera Preview: takes up 2/3 of the screen vertically
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                        20), // Rounded corners for the main camera
+                    borderRadius: BorderRadius.circular(20),
                     child: Container(
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height * 1.6 / 3,
                       decoration: BoxDecoration(
                         border: Border.all(color: Color(0xFFD8DAEB)),
                       ),
-                      child: CameraPreview(
-                          _cameraController), // Main Camera Preview
+                      child: CameraPreview(_cameraController),
                     ),
                   ),
-                  // Selfie Camera Preview: pinned to the top-left corner of the main camera
                   Positioned(
-                    top: 10, // Slight margin from top
-                    left: 10, // Slight margin from left
+                    top: 10,
+                    left: 10,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          10), // Rounded corners for selfie preview
+                      borderRadius: BorderRadius.circular(10),
                       child: Container(
-                        width: 100, // Smaller size for selfie preview
+                        width: 100,
                         height: 100,
                         decoration: BoxDecoration(
                           border: Border.all(color: Color(0xFFD8DAEB)),
                         ),
-                        child: CameraPreview(
-                            _cameraController), // Selfie Camera Preview
+                        child: CameraPreview(_cameraController),
                       ),
                     ),
                   ),
                 ],
               ),
             SizedBox(height: 20),
-            // Post Text Field Section
             Container(
               width: 360,
               height: 60,
@@ -113,17 +104,16 @@ class _PostPageState extends State<PostPage> {
                 child: TextField(
                   controller: postTextController,
                   decoration: InputDecoration(
-                    hintText: 'Write something about....',
+                    hintText: 'Write about something....',
                     hintStyle: TextStyle(
                       color: Colors.black.withOpacity(0.5),
                     ),
                     border: InputBorder.none,
                   ),
                   maxLines: 3,
-                  maxLength: 300, // Limit to 300 characters
-                  textAlign: TextAlign.start, // Text alignment
-                  textDirection:
-                      TextDirection.ltr, // Left to right text direction
+                  maxLength: 300,
+                  textAlign: TextAlign.start,
+                  textDirection: TextDirection.ltr,
                   buildCounter: (BuildContext context,
                       {int? currentLength, int? maxLength, bool? isFocused}) {
                     return Text(
