@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import './stats_section.dart';
 import './tap_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
+import '../pages/main_pages/messages_page.dart';
 
 // StatefulWidget to manage the like button's state
 
@@ -290,7 +290,11 @@ class Comments extends StatelessWidget{
             color: Colors.grey,  // Change color based on like status
             size: 20.0,  // Icon size
           ),
-          onPressed: () => {},  // Call _toggleLike method when button is pressed
+          onPressed:  () {Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MessagesPage()),
+            );
+          },  // Call _toggleLike method when button is pressed
         ),
         Container(
         margin: EdgeInsets.only(top: 5),
@@ -346,7 +350,11 @@ class Comments_patron extends StatelessWidget{
             color: Colors.grey,  // Change color based on like status
             size: 20.0,  // Icon size
           ),
-          onPressed: () => {},  // Call _toggleLike method when button is pressed
+          onPressed:  () {Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MessagesPage()),
+            );
+          },  // Call _toggleLike method when button is pressed
         ),
         Container(
         margin: EdgeInsets.only(top: 5),

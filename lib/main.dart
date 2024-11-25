@@ -8,6 +8,8 @@ import 'appwrite/auth_api.dart';
 void main() {
   // runApp(const MyApp());
   runApp( MyApp());
+  runApp(ChangeNotifierProvider(
+      create: ((context) => AuthAPI()), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -15,17 +17,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final value = context.watch<AuthAPI>().status;
-    //print('TOP CHANGE Value changed to: $value!');
+    final value = context.watch<AuthAPI>().status;
+    print('TOP CHANGE Value changed to: $value!');
 
     return MaterialApp(
-      title: 'Profile App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const ProfileScreen(),
-    );
+        title: 'Moveo',
+        debugShowCheckedModeBanner: false,
+        home: value == AuthStatus.uninitialized
+            ? const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              )
+            : value == AuthStatus.authenticated
+                ? const ProfileScreen()
+                : const LoginPage(),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            primary: const Color(0xFF0437F2),
+          ),
+        ));
   }
 }
