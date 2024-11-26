@@ -4,7 +4,7 @@ A new CorraState project.
 
 ## Getting Started
 
-This App aim to help people to move more in a fun way.
+This app aim to help people to move more in a fun way.
 
 A few resources to get you on board with developers:
 
