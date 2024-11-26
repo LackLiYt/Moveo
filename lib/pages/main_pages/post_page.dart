@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import '../../widgets/profile_footer.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({Key? key}) : super(key: key);
@@ -154,6 +155,7 @@ class _PostPageState extends State<PostPage> {
                 textStyle: TextStyle(fontSize: 18),
               ),
             ),
+            ProfileFooter(ishome: false, isboard: false, ispost: true, isprofile: false,),
           ],
         ),
       ),
@@ -162,20 +164,20 @@ class _PostPageState extends State<PostPage> {
 
   Widget _buildActionButton(String label) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      decoration: BoxDecoration(
-        color: Color(0xFFE3EAF0),
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Color(0xFF102471),
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-    );
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          decoration: BoxDecoration(
+            color: Color(0xFFE3EAF0),
+            borderRadius: BorderRadius.circular(7),
+          ),
+          child:Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF102471),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+        );
   }
 }

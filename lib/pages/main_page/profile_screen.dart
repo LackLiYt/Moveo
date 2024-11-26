@@ -24,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
                     Expanded(
                       child:ProfileContent(),
                     ),
-                    ProfileFooter(),
+                    ProfileFooter(ishome: true,isboard: false,ispost: false,isprofile: false,),
               ]
               ),
             ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+
 class StatsSection extends StatelessWidget {
-  const StatsSection({Key? key}) : super(key: key);
+  List<int> stats = [];
+  StatsSection({required this.stats});
 
   @override
   Widget build(BuildContext context) {
