@@ -1,16 +1,13 @@
-# test
+# Moveo
 
-A new Flutter project.
+A new CorraState project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This App aim to help people to move more in a fun way.
 
-A few resources to get you started if this is your first Flutter project:
+A few resources to get you on board with developers:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- [Lab: Moveo design language](https://www.figma.com/files/team/1424403203958422822/project/286209572/Moveo?fuid=1424403200009962448)
+- [Cookbook: Trello Board](https://trello.com/invite/b/66ef0d2bea9b5fcaaeeb5b51/ATTI12268af5e9af2fab8088f7198f657be9F0B5C7C7/moveo)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
