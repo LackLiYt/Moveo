@@ -25,88 +25,91 @@ class ProfileHeader extends StatelessWidget {
   }
 
   Widget _buildLogoSection() {
-    return Column(
-      children: [
-        Container(
-          width:440,
-        child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children:[Text(
-          'moveo',
-          style: TextStyle(
-            color: AppColors.primary,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+    return Positioned(
+      left: 0,
+      right: 0,
+      child: Column(
+        children: [
+          Container(
+            width: 340,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'moveo',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  _buildMenuSection(),
+                ]),
           ),
-        ),
-        _buildMenuSection(),
-        ]
-      ),),
-        _buildFriendsSection(),
-      ],
+          _buildFriendsSection(),
+        ],
+      ),
     );
   }
 
   Widget _buildFriendsSection() {
-    return Column(
-        children:[const SizedBox(height: 45),
-        Container(
-          width:440,
-          child:Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                color: Colors.grey,
-                shape: BoxShape.circle,
+    return Column(children: [
+      const SizedBox(height: 45),
+      Container(
+          width: 300,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: const BoxDecoration(
+                  color: Colors.grey,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
-            Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                color: Colors.grey,
-                shape: BoxShape.circle,
+              Container(
+                width: 60,
+                height: 60,
+                decoration: const BoxDecoration(
+                  color: Colors.grey,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
-            Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                color: Colors.grey,
-                shape: BoxShape.circle,
+              Container(
+                  width: 60,
+                  height: 60,
+                  decoration: const BoxDecoration(
+                    color: Colors.grey,
+                    shape: BoxShape.circle,
+                  )),
+              Container(
+                width: 60,
+                height: 60,
+                decoration: const BoxDecoration(
+                  color: Colors.grey,
+                  shape: BoxShape.circle,
+                ),
               )
-            ),
-            Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                color: Colors.grey,
-                shape: BoxShape.circle,
-              ),
-            )
-          ],
-          )
+            ],
+          )),
+      const SizedBox(height: 17),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 1),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(55),
         ),
-        const SizedBox(height: 17),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 1),
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(55),
+        child: const Text(
+          'Friends',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
           ),
-          child: const Text(
-            'Friends',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),]
-    );
+        ),
+      ),
+    ]);
   }
 
   Widget _buildMenuSection() {
@@ -114,19 +117,19 @@ class ProfileHeader extends StatelessWidget {
       children: [
         IconButton(
           icon: Icon(
-            Icons.notifications,  // Change icon based on like status
-            color: Colors.grey,  // Change color based on like status
-            size: 30.0,  // Icon size
+            Icons.notifications, // Change icon based on like status
+            color: Colors.grey, // Change color based on like status
+            size: 30.0, // Icon size
           ),
-          onPressed: () => {},  // Call _toggleLike method when button is pressed
+          onPressed: () => {}, // Call _toggleLike method when button is pressed
         ),
         IconButton(
           icon: Icon(
-            Icons.chat_bubble_outline,  // Change icon based on like status
-            color: Colors.grey,  // Change color based on like status
-            size: 30.0,  // Icon size
+            Icons.chat_bubble_outline, // Change icon based on like status
+            color: Colors.grey, // Change color based on like status
+            size: 30.0, // Icon size
           ),
-          onPressed: () => {},  // Call _toggleLike method when button is pressed
+          onPressed: () => {}, // Call _toggleLike method when button is pressed
         )
       ],
     );
