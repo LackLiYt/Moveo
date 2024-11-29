@@ -2,11 +2,12 @@ import 'package:moveo/pages/login/login_page.dart';
 import 'package:moveo/pages/tabs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'pages/main_page/profile_screen.dart';
 import 'appwrite/auth_api.dart';
 
 void main() {
   // runApp(const MyApp());
+  runApp( MyApp());
   runApp(ChangeNotifierProvider(
       create: ((context) => AuthAPI()), child: const MyApp()));
 }
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
                 body: Center(child: CircularProgressIndicator()),
               )
             : value == AuthStatus.authenticated
-                ? const TabsPage()
+                ? const ProfileScreen()
                 : const LoginPage(),
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch().copyWith(

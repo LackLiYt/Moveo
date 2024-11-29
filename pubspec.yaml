@@ -8,9 +8,11 @@ environment:
   sdk: ^3.5.3
 
 dependencies:
+  cached_network_image: ^3.2.0
   flutter:
     sdk: flutter
   appwrite: ^13.0.0
+  webview_flutter: ^4.10.0
 
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.10+1
