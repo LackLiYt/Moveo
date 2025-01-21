@@ -6,7 +6,7 @@ import 'package:moveo/pages/forgotpassword_page.dart';
 import 'package:moveo/pages/login/signup_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextButton(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignUpPage()),
+                    MaterialPageRoute(builder: (context) => const SignUpPage()),
                   ),
                   child: const Text(
                     'Sign up',

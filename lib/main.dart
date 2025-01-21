@@ -1,6 +1,7 @@
 import 'package:moveo/pages/login/login_page.dart';
 import 'package:moveo/pages/tabs_page.dart';
 import 'package:flutter/material.dart';
+import 'package:moveo/theme/theme.dart';
 import 'package:provider/provider.dart';
 
 import 'appwrite/auth_api.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
         title: 'Moveo',
+        //theme: AppTheme.theme, Тест білої/чорної теми
         debugShowCheckedModeBanner: false,
         home: value == AuthStatus.uninitialized
             ? const Scaffold(

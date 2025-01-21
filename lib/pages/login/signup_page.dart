@@ -4,7 +4,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:moveo/appwrite/auth_api.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+  const SignUpPage({super.key});
 
   @override
   _SignUpPageState createState() => _SignUpPageState();

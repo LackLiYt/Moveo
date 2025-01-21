@@ -3,7 +3,7 @@ import 'package:moveo/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({Key? key}) : super(key: key);
+  const AccountPage({super.key});
 
   @override
   _AccountPageState createState() => _AccountPageState();

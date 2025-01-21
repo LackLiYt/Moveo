@@ -4,7 +4,7 @@ import 'package:moveo/pages/main_pages/post_page.dart';
 import 'package:flutter/material.dart';
 
 class TabsPage extends StatefulWidget {
-  const TabsPage({Key? key}) : super(key: key);
+  const TabsPage({super.key});
 
   @override
   _TabsPageState createState() => _TabsPageState();
