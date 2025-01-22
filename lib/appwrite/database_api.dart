@@ -15,8 +15,8 @@ class DatabaseAPI {
 
   init() {
     client
-        .setEndpoint(APPWRITE_URL)
-        .setProject(APPWRITE_PROJECT_ID)
+        .setEndpoint(AppwriteConstants.endPoint)
+        .setProject(AppwriteConstants.projectId)
         .setSelfSigned();
     account = Account(client);
     databases = Databases(client);
@@ -24,15 +24,15 @@ class DatabaseAPI {
 
   Future<DocumentList> getMessages() {
     return databases.listDocuments(
-      databaseId: APPWRITE_DATABASE_ID,
-      collectionId: COLLECTION_MESSAGES,
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.collectionId,
     );
   }
 
   Future<Document> addMessage({required String message}) {
     return databases.createDocument(
-        databaseId: APPWRITE_DATABASE_ID,
-        collectionId: COLLECTION_MESSAGES,
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.collectionId,
         documentId: ID.unique(),
         data: {
           'text': message,
@@ -43,8 +43,8 @@ class DatabaseAPI {
 
   Future<dynamic> deleteMessage({required String id}) {
     return databases.deleteDocument(
-        databaseId: APPWRITE_DATABASE_ID,
-        collectionId: COLLECTION_MESSAGES,
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.collectionId,
         documentId: id);
   }
 }

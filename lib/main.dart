@@ -1,15 +1,17 @@
-import 'package:moveo/pages/login/login_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moveo/features/auth/view/login_page.dart';
 import 'package:moveo/pages/tabs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:moveo/theme/theme.dart';
 import 'package:provider/provider.dart';
 
-import 'appwrite/auth_api.dart';
 
 void main() {
-  // runApp(const MyApp());
-  runApp(ChangeNotifierProvider(
-      create: ((context) => AuthAPI()), child: const MyApp()));
+  runApp(
+    const ProviderScope(
+      child:  MyApp()
+      ),
+    );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,24 +19,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = context.watch<AuthAPI>().status;
-    print('TOP CHANGE Value changed to: $value!');
-
     return MaterialApp(
         title: 'Moveo',
-        //theme: AppTheme.theme, Тест білої/чорної теми
-        debugShowCheckedModeBanner: false,
-        home: value == AuthStatus.uninitialized
-            ? const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              )
-            : value == AuthStatus.authenticated
-                ? const TabsPage()
-                : const LoginPage(),
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: const Color(0xFF0437F2),
-          ),
-        ));
+        theme: AppTheme.theme, //Тест білої/чорної теми
+        home: const LoginPage(),
+        );
   }
 }

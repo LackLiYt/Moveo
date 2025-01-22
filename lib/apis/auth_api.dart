@@ -3,8 +3,14 @@ import 'package:appwrite/models.dart' as model;
 import 'package:fpdart/fpdart.dart';
 import 'package:moveo/core/core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moveo/core/providers.dart';
 
-final authAPIProvider = Provider((ref) {});
+final authAPIProvider = Provider((ref) {
+  final account = ref.watch(appwriteAccountProvider);
+  return AuthAPI(
+    account: account, 
+    );
+});
 
 // Використовувавти Account коли реєструємо юзерів
 // Коли хочемо доступитися до даних юзера model.User
@@ -14,7 +20,13 @@ abstract class IAuthAPI {
     required String password
   });
 
+  FutureEither<model.Session> login({
+    required String email,
+    required String password
+  });
+
 }
+
 
 class AuthAPI implements IAuthAPI {
   final Account _account;
@@ -32,6 +44,28 @@ class AuthAPI implements IAuthAPI {
           password: password
           );
           return right(account);
+    } on AppwriteException catch(e,stackTrace) {
+      return left(
+        Failure(e.message ?? 'Some horrible bullshit happened', stackTrace),
+      );
+    }
+     catch (e, stackTrace) {
+      return left(Failure(e.toString(), stackTrace),
+      );
+    }
+  }
+  
+  @override
+  FutureEither<model.Session> login({
+    required String email,
+     required String password
+     }) async {
+    try {
+      final session = await _account.createEmailPasswordSession(
+         email: email,
+          password: password
+          );
+          return right(session);
     } on AppwriteException catch(e,stackTrace) {
       return left(
         Failure(e.message ?? 'Some horrible bullshit happened', stackTrace),
