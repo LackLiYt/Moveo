@@ -152,7 +152,7 @@ class _PostPageState extends State<PostPage> {
                 minimumSize: const Size(double.infinity, 50),
                 textStyle: const TextStyle(fontSize: 18),
               ),
-              child: Text('Post'),
+              child: const Text('Post'),
             ),
           ],
         ),

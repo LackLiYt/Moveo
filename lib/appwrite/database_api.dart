@@ -25,14 +25,14 @@ class DatabaseAPI {
   Future<DocumentList> getMessages() {
     return databases.listDocuments(
       databaseId: AppwriteConstants.databaseId,
-      collectionId: AppwriteConstants.collectionId,
+      collectionId: AppwriteConstants.usersCollectionId,
     );
   }
 
   Future<Document> addMessage({required String message}) {
     return databases.createDocument(
         databaseId: AppwriteConstants.databaseId,
-        collectionId: AppwriteConstants.collectionId,
+        collectionId: AppwriteConstants.usersCollectionId,
         documentId: ID.unique(),
         data: {
           'text': message,
@@ -44,7 +44,7 @@ class DatabaseAPI {
   Future<dynamic> deleteMessage({required String id}) {
     return databases.deleteDocument(
         databaseId: AppwriteConstants.databaseId,
-        collectionId: AppwriteConstants.collectionId,
+        collectionId: AppwriteConstants.usersCollectionId,
         documentId: id);
   }
 }

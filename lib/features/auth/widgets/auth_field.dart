@@ -21,9 +21,9 @@ class AuthField extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: Colors.grey, width: 1)),
           filled: true,
-          fillColor: Color(0xFF0437F2),
+          fillColor: const Color(0xFF0437F2),
           
-        contentPadding: EdgeInsets.all(20),
+        contentPadding: const EdgeInsets.all(20),
         
         hintText: hintText,
         hintStyle: GoogleFonts.montserrat(

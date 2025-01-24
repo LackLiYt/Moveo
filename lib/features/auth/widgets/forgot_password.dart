@@ -6,11 +6,11 @@ class ForgotPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text('Forgot password?',
-    style: GoogleFonts.montserrat(color: Color(0xFF0437F2),
+    style: GoogleFonts.montserrat(color: const Color(0xFF0437F2),
     fontWeight: FontWeight.bold,
     fontSize: 12,
     decoration: TextDecoration.underline,
-    decorationColor: Color(0xFF0437F2)
+    decorationColor: const Color(0xFF0437F2)
     ));
     
   }

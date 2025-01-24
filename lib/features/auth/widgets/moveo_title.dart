@@ -7,6 +7,6 @@ class MoveoTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text('moveo', style: GoogleFonts.montserrat(color: Color(0xFF0437F2), fontWeight: FontWeight.bold, fontSize: 50 ));
+    return Text('moveo', style: GoogleFonts.montserrat(color: const Color(0xFF0437F2), fontWeight: FontWeight.bold, fontSize: 50 ));
   }
 }

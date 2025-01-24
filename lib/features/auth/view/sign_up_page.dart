@@ -39,7 +39,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   Widget build(BuildContext context) {
     final isLoading = ref.watch(authControllerProvider);
     return Scaffold(body: isLoading ? const Loader() : Center(
-      child: Padding(padding: EdgeInsets.symmetric(horizontal: 45),
+      child: Padding(padding: const EdgeInsets.symmetric(horizontal: 45),
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children:[
@@ -47,7 +47,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
             
 
             
-            MoveoTitle(),
+            const MoveoTitle(),
             const SizedBox(height:75),
           
 
@@ -67,16 +67,16 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
             //sign up button
             const SizedBox(height: 45,),
 
-            LoginButton(label: 'Sign up', onTap:  onSignUp, backgroundColor: Color(0xFF0437F2), textColor: Colors.white,),
+            LoginButton(label: 'Sign up', onTap:  onSignUp, backgroundColor: const Color(0xFF0437F2), textColor: Colors.white,),
 
             //don't have an account? Sign up
-            SizedBox(height: 75,),
+            const SizedBox(height: 75,),
             RichText(text: TextSpan(
       text: "Already have an account?",
-      style: GoogleFonts.montserrat(color:Color(0xFF0437F2), fontWeight: FontWeight.w600,),
+      style: GoogleFonts.montserrat(color:const Color(0xFF0437F2), fontWeight: FontWeight.w600,),
       
       children: [
-        TextSpan(text: " Log in", style: GoogleFonts.montserrat(color: Color(0xFF0437F2),fontWeight: FontWeight.w600,), recognizer: TapGestureRecognizer()..onTap=(){
+        TextSpan(text: " Log in", style: GoogleFonts.montserrat(color: const Color(0xFF0437F2),fontWeight: FontWeight.w600,), recognizer: TapGestureRecognizer()..onTap=(){
           Navigator.push(context, LoginPage.route(),);
         })
       ]
