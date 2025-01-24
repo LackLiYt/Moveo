@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/features/auth/view/login_page.dart';
+import 'package:moveo/features/auth/view/sign_up_page.dart';
 import 'package:moveo/pages/tabs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:moveo/theme/theme.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Moveo',
         theme: AppTheme.theme, //Тест білої/чорної теми
-        home: const LoginPage(),
+        home: const SignUpPage(),
         );
   }
 }

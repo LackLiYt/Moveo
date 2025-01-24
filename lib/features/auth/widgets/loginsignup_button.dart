@@ -19,16 +19,19 @@ class LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      label: Text(label, style: GoogleFonts.montserrat(color: textColor, fontWeight: FontWeight.w600), overflow: TextOverflow.visible,),
-      backgroundColor: backgroundColor,
-      labelPadding: const EdgeInsets.symmetric(horizontal: 152, vertical: 7),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+    return InkWell(
+      onTap:onTap,
+      child: Chip(
+        label: Text(label, style: GoogleFonts.montserrat(color: textColor, fontWeight: FontWeight.w600), overflow: TextOverflow.visible,),
+        backgroundColor: backgroundColor,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 152, vertical: 7),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+        
+        
       
       
-
-
-      
+        
+      ),
     );
 
   }
