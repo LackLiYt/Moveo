@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:moveo/common/loading_page.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/features/auth/view/sign_up_page.dart';
 import 'package:moveo/features/auth/widgets/auth_field.dart';
 import 'package:moveo/features/auth/widgets/forgot_password.dart';
-import 'package:moveo/features/auth/widgets/login_button.dart';
+import 'package:moveo/features/auth/widgets/loginsignup_button.dart';
 import 'package:moveo/features/auth/widgets/moveo_title.dart';
 
 
@@ -42,7 +43,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final isLoading = ref.watch(authControllerProvider);
     return Scaffold(
-      body: Center(
+      body: isLoading ? const Loader() : Center(
       child: Padding(padding: EdgeInsets.symmetric(horizontal: 45),
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

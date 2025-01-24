@@ -1,7 +1,10 @@
+import 'package:appwrite/models.dart' as model;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/apis/auth_api.dart';
 import 'package:moveo/core/utils.dart';
+import 'package:moveo/features/auth/home/view/home_view.dart';
+import 'package:moveo/features/auth/view/login_page.dart';
 
 final authControllerProvider = 
 StateNotifierProvider<AuthController, bool>((ref) {
@@ -10,10 +13,17 @@ StateNotifierProvider<AuthController, bool>((ref) {
   );
 });
 
+final currentUserAccountProvider = FutureProvider((ref) {
+  final AuthController = ref.watch(authControllerProvider.notifier);
+  return AuthController.currentUser() ;
+});
+
 class AuthController extends StateNotifier<bool> {
   final AuthAPI _authAPI;
   AuthController({required AuthAPI authAPI}): _authAPI = authAPI, super(false);
   //стан = Завантажується/ state = isLoading
+
+  Future<model.User?> currentUser() => _authAPI.currentUserAccount();
 
   void signUp({
     required String email,
@@ -25,9 +35,13 @@ class AuthController extends StateNotifier<bool> {
       email: email,
        password: password,
       );
+      state = false;
       res.fold(
         (l) => showSnackBar(context, l.massage),
-         (r) => print(r.email)
+         (r) {
+          showSnackBar(context, ' Account created! Pleaseee lock in ');
+          Navigator.push(context, LoginPage.route());
+         },
          );
   }
    
@@ -43,7 +57,9 @@ class AuthController extends StateNotifier<bool> {
       );
       res.fold(
         (l) => showSnackBar(context, l.massage),
-         (r) => print(r.userId)
+         (r) {
+          Navigator.push(context, HomeView.route());
+         }
          );
   }
    

@@ -2,10 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:moveo/common/loading_page.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/features/auth/view/login_page.dart';
 import 'package:moveo/features/auth/widgets/auth_field.dart';
-import 'package:moveo/features/auth/widgets/login_button.dart';
+import 'package:moveo/features/auth/widgets/loginsignup_button.dart';
 import 'package:moveo/features/auth/widgets/moveo_title.dart';
 
 class SignUpPage extends ConsumerStatefulWidget {
@@ -36,7 +37,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body:Center(
+    final isLoading = ref.watch(authControllerProvider);
+    return Scaffold(body: isLoading ? const Loader() : Center(
       child: Padding(padding: EdgeInsets.symmetric(horizontal: 45),
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

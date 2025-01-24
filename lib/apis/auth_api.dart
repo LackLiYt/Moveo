@@ -25,12 +25,28 @@ abstract class IAuthAPI {
     required String password
   });
 
+  Future<model.User?> currentUserAccount();
+
 }
+
 
 
 class AuthAPI implements IAuthAPI {
   final Account _account;
   AuthAPI({required Account account}) : _account = account;
+
+  @override
+  Future<model.User?> currentUserAccount() async {
+    try {
+      return await _account.get();
+    } on AppwriteException catch(e) {
+      return null;
+    }
+     catch (e) {
+      return null;
+  }
+  }
+
 
   @override
   FutureEither<model.User> sighUp({
@@ -76,5 +92,6 @@ class AuthAPI implements IAuthAPI {
       );
     }
   }
-
+  
+  
 }
