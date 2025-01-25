@@ -1,11 +1,9 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:moveo/constants/appwrite_constants.dart';
 import 'package:moveo/core/core.dart';
 import 'package:moveo/core/providers.dart';
-import 'package:moveo/core/type_defs.dart';
 import 'package:moveo/models/user_model.dart';
 
 final userAPIProvider = Provider((ref) {
@@ -27,7 +25,7 @@ class UserAPI implements IUserAPI {
         await _db.createDocument(
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.usersCollectionId,
-        documentId: ID.unique(),
+        documentId: userModel.uid,
         data: userModel.toMap(),
       );
       return right(null);

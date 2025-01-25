@@ -1,8 +1,13 @@
-import 'package:moveo/pages/login/login_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moveo/common/error_page.dart';
+import 'package:moveo/common/loading_page.dart';
+import 'package:moveo/features/auth/controller/auth_controller.dart';
+import 'package:moveo/features/auth/view/sign_up_page.dart';
+import 'package:moveo/features/home/view/home_view.dart';
 import 'package:moveo/pages/tabs_page.dart';
 import 'package:flutter/material.dart';
+import 'package:moveo/theme/app_theme.dart';
 import 'package:provider/provider.dart';
-
 import 'appwrite/auth_api.dart';
 
 void main() {
