@@ -12,10 +12,10 @@ class UiConstants {
   }
 
   static List<Widget> bottomTabBarPages = [
-    Text('Home Screen'),
-    Text('Public Screen'),
-    Text('Post Screen'),
-    Text('Account Screen'),
+    const Text('Home Screen'),
+    const Text('Public Screen'),
+    const Text('Post Screen'),
+    const Text('Account Screen'),
   ];
 
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
 import 'package:moveo/constants/ui_constants.dart';
-import 'package:moveo/features/post/views/create_post_view.dart';
 import 'package:moveo/theme/pallete.dart';
 
 class HomeView extends StatefulWidget {
