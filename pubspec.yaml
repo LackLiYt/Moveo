@@ -33,6 +33,7 @@ flutter:
     - assets/apple_icon.svg
     - assets/github_icon.svg
     - assets/twitter_icon.svg
+    - assets/svgs/
 
   fonts:
     - family: Montserrat
