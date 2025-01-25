@@ -9,4 +9,12 @@ class UiConstants {
       ),
     );
   }
+
+  static List<Widget> bottomTabBarPages = [
+    Text('Home Screen'),
+    Text('Public Screen'),
+    Text('Post Screen'),
+    Text('Account Screen'),
+  ];
+
 }
