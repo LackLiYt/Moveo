@@ -32,8 +32,8 @@ class AuthAPI extends ChangeNotifier {
 
   init() {
     client
-        .setEndpoint(APPWRITE_URL)
-        .setProject(APPWRITE_PROJECT_ID)
+        .setEndpoint(AppwriteConstants.endPoint)
+        .setProject(AppwriteConstants.projectId)
         .setSelfSigned();
     account = Account(client);
   }

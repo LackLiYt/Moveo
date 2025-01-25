@@ -11,16 +11,18 @@ dependencies:
   flutter:
     sdk: flutter
   appwrite: ^13.0.0
-
+  dart_appwrite: ^12.1.0
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.10+1
   provider: ^6.0.5
   camera: ^0.10.0+3
+  fpdart: ^1.1.1
+  flutter_riverpod: ^2.6.1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^4.0.0
 
 flutter:
@@ -31,6 +33,7 @@ flutter:
     - assets/apple_icon.svg
     - assets/github_icon.svg
     - assets/twitter_icon.svg
+    - assets/svgs/
 
   fonts:
     - family: Montserrat

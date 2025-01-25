@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 
 class PostPage extends StatefulWidget {
-  const PostPage({Key? key}) : super(key: key);
+  const PostPage({super.key});
 
   @override
   _PostPageState createState() => _PostPageState();
@@ -68,7 +68,7 @@ class _PostPageState extends State<PostPage> {
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height * 1.6 / 3,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xFFD8DAEB)),
+                        border: Border.all(color: const Color(0xFFD8DAEB)),
                       ),
                       child: CameraPreview(_cameraController),
                     ),
@@ -82,7 +82,7 @@ class _PostPageState extends State<PostPage> {
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xFFD8DAEB)),
+                          border: Border.all(color: const Color(0xFFD8DAEB)),
                         ),
                         child: CameraPreview(_cameraController),
                       ),
@@ -90,13 +90,13 @@ class _PostPageState extends State<PostPage> {
                   ),
                 ],
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Container(
               width: 360,
               height: 60,
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(color: Color(0xFFD8DAEB)),
+                border: Border.all(color: const Color(0xFFD8DAEB)),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Padding(
@@ -118,7 +118,7 @@ class _PostPageState extends State<PostPage> {
                       {int? currentLength, int? maxLength, bool? isFocused}) {
                     return Text(
                       '$currentLength/$maxLength',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 12,
                       ),
@@ -127,32 +127,32 @@ class _PostPageState extends State<PostPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Action buttons (Edit photo, Add music, etc.)
             Row(
               mainAxisAlignment:
                   MainAxisAlignment.center, // Centering the buttons
               children: [
                 _buildActionButton('Edit photo'),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 _buildActionButton('Add music'),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 _buildActionButton('Tag friends'),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 _buildActionButton('Add location'),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Post button
             ElevatedButton(
               onPressed: () {
                 // Implement post action here
               },
-              child: Text('Post'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-                textStyle: TextStyle(fontSize: 18),
+                minimumSize: const Size(double.infinity, 50),
+                textStyle: const TextStyle(fontSize: 18),
               ),
+              child: const Text('Post'),
             ),
           ],
         ),
@@ -162,15 +162,15 @@ class _PostPageState extends State<PostPage> {
 
   Widget _buildActionButton(String label) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       decoration: BoxDecoration(
-        color: Color(0xFFE3EAF0),
+        color: const Color(0xFFE3EAF0),
         borderRadius: BorderRadius.circular(7),
       ),
       child: Text(
         label,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           color: Color(0xFF102471),
           fontSize: 12,
           fontWeight: FontWeight.w400,
