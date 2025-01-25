@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
 import 'package:moveo/constants/ui_constants.dart';
-import 'package:moveo/features/post/views/create_post_view.dart';
 import 'package:moveo/theme/pallete.dart';
 
 class HomeView extends StatefulWidget {
@@ -27,20 +26,10 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  // onCreatePost() {
-  //   Navigator.push(context, CreatePostScreen.route());
-  // }
-
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar,
-      body:IndexedStack(
-        index: _page,
-        children: UiConstants.bottomTabBarPages,
-      ),
       bottomNavigationBar: CupertinoTabBar(
           backgroundColor: Pallete.backgroundColor,
           currentIndex: _page,

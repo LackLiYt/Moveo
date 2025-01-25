@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/apis/auth_api.dart';
 import 'package:moveo/apis/user_api.dart';
 import 'package:moveo/core/utils.dart';
-import 'package:moveo/features/home/view/home_view.dart';
+import 'package:moveo/features/auth/home/view/home_view.dart';
 import 'package:moveo/features/auth/view/login_page.dart';
 import 'package:moveo/models/user_model.dart';
 
@@ -53,7 +53,7 @@ class AuthController extends StateNotifier<bool> {
           following: const [],
           profilePic: '',
           bannerPic: '',
-          uid: r.$id,
+          uid: '',
           bio: '',
           isCooked: false,
         );
