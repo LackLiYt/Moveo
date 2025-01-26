@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
 import 'package:moveo/constants/ui_constants.dart';
-import 'package:moveo/theme/pallete.dart';
+import 'package:moveo/features/post/views/create_post_view.dart';
 
 class HomeView extends StatefulWidget {
   static route() => MaterialPageRoute(
@@ -25,54 +25,69 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  // onCreatePost() {
-  //   Navigator.push(context, CreatePostScreen.route());
-  // }
-
-  
+  void onCreatePost() {
+    Navigator.push(context, CreatePostScreen.route());
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Use Theme to dynamically retrieve colors
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDarkMode ? Theme.of(context).scaffoldBackgroundColor : Colors.white;
+    final iconColor =
+        isDarkMode ? Colors.white : Colors.black; // Adjust icon colors
+
     return Scaffold(
       appBar: appBar,
-      body:IndexedStack(
+      body: IndexedStack(
         index: _page,
         children: UiConstants.bottomTabBarPages,
       ),
       bottomNavigationBar: CupertinoTabBar(
-          backgroundColor: Pallete.backgroundColor,
-          currentIndex: _page,
-          onTap: onPageChange,
-          items: [
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                _page == 0
-                    ? AssetsConstants.HomeFilledIcon
-                    : AssetsConstants.HomeOutlinedIcon,
-                color: Pallete.whiteColor,
-              ),
+        backgroundColor: backgroundColor,
+        currentIndex: _page,
+        onTap: (index) {
+          if (index == 2) {
+            // Post icon index
+            onCreatePost();
+          } else {
+            onPageChange(index);
+          }
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              _page == 0
+                  ? AssetsConstants.HomeFilledIcon
+                  : AssetsConstants.HomeOutlinedIcon,
+              color: iconColor,
             ),
-            BottomNavigationBarItem(
-                icon: SvgPicture.asset(
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
               AssetsConstants.GlobalIcon,
-              color: Pallete.whiteColor,
-            )),
-            BottomNavigationBarItem(
-                icon: SvgPicture.asset(
+              color: iconColor,
+            ),
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
               _page == 2
                   ? AssetsConstants.PostFilledIcon
                   : AssetsConstants.PostOutlinedIcon,
-              color: Pallete.whiteColor,
-            )),
-            BottomNavigationBarItem(
-                icon: SvgPicture.asset(
+              color: iconColor,
+            ),
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
               _page == 3
                   ? AssetsConstants.AccountFilledIcon
                   : AssetsConstants.AccountOutlinedIcon,
-              color: Pallete.whiteColor,
-            )),
-          ]),
-      
+              color: iconColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

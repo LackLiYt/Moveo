@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:moveo/constants/appwrite_constants.dart';
+import 'package:moveo/constants/constants.dart';
 import 'package:moveo/core/core.dart';
 import 'package:moveo/core/providers.dart';
 import 'package:moveo/models/user_model.dart';

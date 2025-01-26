@@ -5,6 +5,7 @@ import 'package:moveo/core/core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/core/providers.dart';
 
+
 final authAPIProvider = Provider((ref) {
   final account = ref.watch(appwriteAccountProvider);
   return AuthAPI(
