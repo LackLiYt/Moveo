@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
 
 class UiConstants {
-
-  static AppBar appBar() {
+  static AppBar appBar(BuildContext context) {
     return AppBar(
-      title: SvgPicture.asset(AssetsConstants.MoveoTitleBlue,
+      centerTitle: true, // Center the title
+      title: SvgPicture.asset(
+        // Dynamically choose the title asset based on the theme
+        Theme.of(context).brightness == Brightness.light
+            ? AssetsConstants.MoveoTitleBlue
+            : AssetsConstants.MoveoTitleBlack,
       ),
     );
   }
@@ -17,5 +21,4 @@ class UiConstants {
     const Text('Post Screen'),
     const Text('Account Screen'),
   ];
-
 }

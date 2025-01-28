@@ -17,7 +17,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int _page = 0;
-  final appBar = UiConstants.appBar();
 
   void onPageChange(int index) {
     setState(() {
@@ -37,6 +36,9 @@ class _HomeViewState extends State<HomeView> {
         isDarkMode ? Theme.of(context).scaffoldBackgroundColor : Colors.white;
     final iconColor =
         isDarkMode ? Colors.white : Colors.black; // Adjust icon colors
+
+    // Initialize the appBar with context
+    final appBar = UiConstants.appBar(context);
 
     return Scaffold(
       appBar: appBar,

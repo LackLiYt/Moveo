@@ -38,26 +38,30 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     postTextController.dispose();
     _cameraController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context); // Close the screen
+          },
           icon: const Icon(Icons.close, size: 30),
         ),
         centerTitle: true,
         title: const Text(
-          'New post',
+          'New Post',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'Montserrat',
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
@@ -65,110 +69,107 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (_isCameraInitialized)
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height * 1.6 / 3,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFD8DAEB)),
-                      ),
-                      child: CameraPreview(_cameraController),
-                    ),
-                  ),
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (_isCameraInitialized)
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
                       child: Container(
-                        width: 100,
-                        height: 100,
+                        width: double.infinity,
+                        height: screenSize.height * 0.4,
                         decoration: BoxDecoration(
                           border: Border.all(color: const Color(0xFFD8DAEB)),
                         ),
                         child: CameraPreview(_cameraController),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            const SizedBox(height: 20),
-            Container(
-              width: 360,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: const Color(0xFFD8DAEB)),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: postTextController,
-                  decoration: InputDecoration(
-                    hintText: 'Write about something....',
-                    hintStyle: TextStyle(
-                      color: Colors.black.withOpacity(0.5),
-                    ),
-                    border: InputBorder.none,
-                  ),
-                  maxLines: 3,
-                  maxLength: 300,
-                  textAlign: TextAlign.start,
-                  textDirection: TextDirection.ltr,
-                  buildCounter: (BuildContext context,
-                      {int? currentLength, int? maxLength, bool? isFocused}) {
-                    return Text(
-                      '$currentLength/$maxLength',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: screenSize.width * 0.25,
+                          height: screenSize.width * 0.25,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFD8DAEB)),
+                          ),
+                          child: CameraPreview(_cameraController),
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFFD8DAEB)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: postTextController,
+                    decoration: InputDecoration(
+                      hintText: 'Write about something...',
+                      hintStyle: TextStyle(
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    maxLines: 3,
+                    maxLength: 300,
+                    buildCounter: (BuildContext context,
+                        {int? currentLength, int? maxLength, bool? isFocused}) {
+                      return Text(
+                        '$currentLength/$maxLength',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            // Action buttons (Edit photo, Add music, etc.)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Centering the buttons
-              children: [
-                _buildActionButton('Edit photo'),
-                const SizedBox(width: 10),
-                _buildActionButton('Add music'),
-                const SizedBox(width: 10),
-                _buildActionButton('Tag friends'),
-                const SizedBox(width: 10),
-                _buildActionButton('Add location'),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Post button
-            ElevatedButton(
-              onPressed: () {
-                // Implement post action here
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                textStyle: const TextStyle(fontSize: 18),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildActionButton('Edit photo', screenSize),
+                  const SizedBox(width: 10),
+                  _buildActionButton('Add music', screenSize),
+                  const SizedBox(width: 10),
+                  _buildActionButton('Tag friends', screenSize),
+                  const SizedBox(width: 10),
+                  _buildActionButton('Add location', screenSize),
+                ],
               ),
-              child: const Text('Post'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // Implement post action here
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+                child: const Text('Post'),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildActionButton(String label) {
+  Widget _buildActionButton(String label, Size screenSize) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       decoration: BoxDecoration(
@@ -178,9 +179,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       child: Text(
         label,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Color(0xFF102471),
-          fontSize: 12,
+        style: TextStyle(
+          color: const Color(0xFF102471),
+          fontSize: screenSize.width * 0.03, // Dynamic font size
           fontWeight: FontWeight.w400,
         ),
       ),
