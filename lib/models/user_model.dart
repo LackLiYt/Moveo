@@ -52,13 +52,14 @@ class UserModel {
 
     result.addAll({'email': email});
     result.addAll({'name': name});
-    result.addAll({'followers': followers});
-    result.addAll({'following': following});
-    result.addAll({'profilePic': profilePic});
-    result.addAll({'bannerPic': bannerPic});
-    result.addAll({'bio': bio});
-    result.addAll({'isCooked': isCooked});
-
+    result.addAll({'followers' : followers});
+    result.addAll({'following' : following});
+    result.addAll({'profilePic' : profilePic});
+    result.addAll({'bannerPic' : bannerPic});
+    result.addAll({'uid': uid});
+    result.addAll({'bio' : bio});
+    result.addAll({'isCooked' : isCooked});
+    
     return result;
   }
 
@@ -70,11 +71,12 @@ class UserModel {
       following: List<String>.from(map['following']),
       profilePic: map['profilePic'] ?? '',
       bannerPic: map['bannerPic'] ?? '',
-      uid: map['\$id'] ?? '',
+      uid: map['uid'] ?? '',
       bio: map['bio'] ?? '',
-      isCooked: map['isTwitterBlue'] ?? false,
+      isCooked: map['isCooked'] ?? false,
     );
   }
+
 
   @override
   String toString() {
@@ -84,29 +86,29 @@ class UserModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-
-    return other is UserModel &&
-        other.email == email &&
-        other.name == name &&
-        listEquals(other.followers, followers) &&
-        listEquals(other.following, following) &&
-        other.profilePic == profilePic &&
-        other.bannerPic == bannerPic &&
-        other.uid == uid &&
-        other.bio == bio &&
-        other.isCooked == isCooked;
+  
+    return  other is UserModel &&
+      other.email == email &&
+      other.name == name &&
+      listEquals(other.followers, followers) &&
+      listEquals(other.following, following) &&
+      other.profilePic == profilePic &&
+      other.bannerPic == bannerPic &&
+      other.uid == uid &&
+      other.bio == bio &&
+      other.isCooked == isCooked;
   }
 
   @override
   int get hashCode {
     return email.hashCode ^
-        name.hashCode ^
-        followers.hashCode ^
-        following.hashCode ^
-        profilePic.hashCode ^
-        bannerPic.hashCode ^
-        uid.hashCode ^
-        bio.hashCode ^
-        isCooked.hashCode;
+      name.hashCode ^
+      followers.hashCode ^
+      following.hashCode ^
+      profilePic.hashCode ^
+      bannerPic.hashCode ^
+      uid.hashCode ^
+      bio.hashCode ^
+      isCooked.hashCode;
   }
 }

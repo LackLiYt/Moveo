@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
 import 'package:moveo/constants/ui_constants.dart';
 import 'package:moveo/features/post/views/create_post_view.dart';
+import 'package:moveo/features/account/accout_page.dart';
 
 class HomeView extends StatefulWidget {
   static route() => MaterialPageRoute(
@@ -26,6 +27,10 @@ class _HomeViewState extends State<HomeView> {
 
   void onCreatePost() {
     Navigator.push(context, CreatePostScreen.route());
+  }
+
+  void onAccount() {
+    Navigator.push(context, AccountPage.route());
   }
 
   @override
@@ -53,6 +58,9 @@ class _HomeViewState extends State<HomeView> {
           if (index == 2) {
             // Post icon index
             onCreatePost();
+          } else if (index == 3) {
+            // Account icon index
+            onAccount();
           } else {
             onPageChange(index);
           }

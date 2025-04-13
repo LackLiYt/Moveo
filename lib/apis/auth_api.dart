@@ -27,7 +27,8 @@ abstract class IAuthAPI {
   });
 
   Future<model.User?> currentUserAccount();
-
+  
+  Future<void> logout();
 }
 
 
@@ -37,15 +38,33 @@ class AuthAPI implements IAuthAPI {
   AuthAPI({required Account account}) : _account = account;
 
   @override
+  Future<void> logout() async {
+    try {
+      // Спочатку видалити всі сесії
+      try {
+        await _account.deleteSessions();
+      } catch (e) {
+
+        // Якщо видалити всі сесії чомусь не виходить, то видаляємо цю сесію
+        await _account.deleteSession(sessionId: 'current');
+      }
+    } catch (e) {
+      print('Logout error: $e');
+      rethrow;
+    }
+  }
+
+  @override
   Future<model.User?> currentUserAccount() async {
     try {
       return await _account.get();
-    } on AppwriteException {
+    } on AppwriteException catch (e) {
+      print('Current user account error: $e');
+      return null;
+    } catch (e) {
+      print('Unexpected error in currentUserAccount: $e');
       return null;
     }
-     catch (e) {
-      return null;
-  }
   }
 
 
@@ -78,6 +97,14 @@ class AuthAPI implements IAuthAPI {
      required String password
      }) async {
     try {
+      //Спочатку видалити всі існуючі сесії
+      try {
+        await _account.deleteSessions();
+      } catch (e) {
+        print('Warning: Could not delete existing sessions: $e');
+      }
+
+      // Тоді стоворити сесію
       final session = await _account.createEmailPasswordSession(
          email: email,
           password: password
@@ -85,7 +112,7 @@ class AuthAPI implements IAuthAPI {
           return right(session);
     } on AppwriteException catch(e,stackTrace) {
       return left(
-        Failure(e.message ?? 'Some horrible bullshit happened', stackTrace),
+        Failure(e.message ?? 'Authentication failed', stackTrace),
       );
     }
      catch (e, stackTrace) {

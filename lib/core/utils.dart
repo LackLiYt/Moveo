@@ -1,8 +1,9 @@
-
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moveo/features/auth/controller/auth_controller.dart';
+import 'package:moveo/features/auth/view/login_page.dart';
 
 void showSnackBar(BuildContext context, String content) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -35,4 +36,17 @@ Future<File?> pickSingleImage() async {
     return File(imageFile.path);
   }
   return null; 
+}
+
+Future<void> logout(BuildContext context, WidgetRef ref) async {
+  final authController = ref.read(authControllerProvider.notifier);
+  try {
+    await authController.logout();
+    Navigator.of(context).pushAndRemoveUntil(
+      LoginPage.route(),
+      (route) => false,
+    );
+  } catch (e) {
+    showSnackBar(context, 'Error logging out: ${e.toString()}');
+  }
 }

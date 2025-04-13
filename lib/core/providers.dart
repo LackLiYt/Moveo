@@ -6,8 +6,7 @@ final appwriteClientProvider = Provider((ref){
   Client client = Client();
   return client
   .setEndpoint(AppwriteConstants.endPoint)
-  .setProject(AppwriteConstants.projectId)
-  .setSelfSigned(status: true);
+  .setProject(AppwriteConstants.projectId);
 });
 
 final appwriteAccountProvider = Provider((ref) {
