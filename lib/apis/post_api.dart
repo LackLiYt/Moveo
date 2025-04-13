@@ -9,11 +9,13 @@ import 'package:moveo/core/providers.dart';
 import 'package:moveo/models/post_model.dart';
 
 final postAPIProvider = Provider((ref) {
-  return PostAPI(db: ref.watch(appwriteDatabaseProvider));
+  return PostAPI(db: ref.watch(appwriteDatabaseProvider)
+  );
 });
 
 abstract class IPostAPI {
   FutureEither<Document> sharePost(Post post);
+  Future<List<Document>> getPosts();
 }
 
 class PostAPI implements IPostAPI {
@@ -24,7 +26,7 @@ class PostAPI implements IPostAPI {
     try {
         final document = await _db.createDocument(
         databaseId: AppwriteConstants.databaseId,
-        collectionId: AppwriteConstants.postCollectionId,
+        collectionId: AppwriteConstants.postTestCollectionId,
         documentId: ID.unique(),
         data: post.toMap(),
       );
@@ -38,4 +40,12 @@ class PostAPI implements IPostAPI {
     }  
   }
 
+  @override
+  Future<List<Document>> getPosts() async {
+      final documents = await _db.listDocuments(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.postTestCollectionId,
+      );
+      return documents.documents;
+  }
 }

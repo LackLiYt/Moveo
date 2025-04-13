@@ -28,7 +28,7 @@ class MyApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme, // Чорна тема
       home: ref.watch(currentUserAccountProvider).when(
             data: (user) {
-              // ignore: unnecessary_null_comparison
+              
               if (user != null) {
                 return const HomeView();
               }

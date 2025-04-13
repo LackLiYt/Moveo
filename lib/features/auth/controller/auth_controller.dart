@@ -23,6 +23,19 @@ final currentUserAccountProvider = FutureProvider((ref) async {
   }
 });
 
+final userDetailsProvider = FutureProvider.autoDispose((ref) async {
+  final authController = ref.watch(authControllerProvider.notifier);
+  final user = await authController.currentUser();
+  if (user == null) {
+    return null;
+  }
+  return await ref.watch(userAPIProvider).getUserData(user.$id);
+});
+
+final getUserDetailsByIdProvider = FutureProvider.family.autoDispose((ref, String uid) async {
+  return await ref.watch(userAPIProvider).getUserData(uid);
+});
+
 // Create the auth controller provider
 final authControllerProvider = StateNotifierProvider<AuthController, bool>((ref) {
   return AuthController(

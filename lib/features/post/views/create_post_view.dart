@@ -7,6 +7,7 @@ import 'package:moveo/common/common.dart';
 import 'package:moveo/constants/constants.dart';
 import 'package:moveo/core/utils.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
+import 'package:moveo/features/post/controller/post_controller.dart';
 import 'package:moveo/theme/pallete.dart';
 
 class CreatePostScreen extends ConsumerStatefulWidget {
@@ -29,10 +30,18 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     postTextController.dispose();
   }
 
+  void sharePost() {
+    ref.read(postControllerProvider.notifier).sharePost(
+      images: images,
+       text: postTextController.text,
+        context: context,
+        );
+  }
+
   void onPickImages() async {
-    await pickMultiImages();
+    final selectedImages = await pickMultiImages();
     setState(() {
-      
+      images = selectedImages;
     });
   }
 
@@ -50,8 +59,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
            icon: const Icon(Icons.close, size: 30,)
            ),
            actions: [
-            RoundedSmallButton(onTap: () {},
-             label: 'Post')
+            RoundedSmallButton(
+              onTap: sharePost,
+             label: 'Post',
+             backgroundColor: Pallete.whiteColor,
+             textColor: Pallete.backgroundColor,
+             )
            ],
       ),
       body: currentUserAsync.when(

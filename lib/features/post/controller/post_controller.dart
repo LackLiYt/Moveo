@@ -2,20 +2,43 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/apis/post_api.dart';
+import 'package:moveo/apis/storage_api.dart';
 import 'package:moveo/core/utils.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/models/post_model.dart';
 
+final postControllerProvider = StateNotifierProvider<PostController, bool>((ref) {
+  return PostController(
+    ref: ref,
+    postAPI: ref.watch(postAPIProvider),
+    storageAPI: ref.watch(storageAPIProvider),
+    );
+  },
+);
+
+final getPostsProvider = FutureProvider((ref) {
+  final postController = ref.watch(postControllerProvider.notifier);
+  return postController.getPosts();
+});
+
 class PostController extends StateNotifier<bool> {
   final PostAPI _postAPI;
   final Ref _ref;
+  final StorageAPI _storage;
   PostController({
     required Ref ref,
-     required PostAPI postAPI
+     required PostAPI postAPI,
+      required StorageAPI storageAPI
      }):
       _ref = ref,
       _postAPI = postAPI,
+      _storage = storageAPI,
       super(false);
+
+  Future<List<Post>> getPosts() async {
+    final postList = await _postAPI.getPosts();
+    return postList.map((post) => Post.fromMap(post.data)).toList();
+  }
 
   void sharePost ({
     required List<File> images,
@@ -46,11 +69,12 @@ class PostController extends StateNotifier<bool> {
     final hashtags = _getHastagsFromText(text);
     String link = _getLinkFromText(text);
     final user = _ref.read(currentUserDetailsProvider).value!;
+    final imageLinks = await _storage.uploadImage(images);
     Post post = Post(
       text: text,
        hashtags: hashtags,
         link: link,
-         imageLinks: const [],
+         imageLinks: imageLinks,
           uid: user.uid,
            createdAt: DateTime.now(),
             likes: const [],
@@ -58,6 +82,7 @@ class PostController extends StateNotifier<bool> {
               id: '',
               );
     final res = await _postAPI.sharePost(post);
+    state = false;
     res.fold(
       (l) => showSnackBar(context, l.massage),
       (r) => null);
