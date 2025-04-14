@@ -47,30 +47,18 @@ final authControllerProvider = StateNotifierProvider<AuthController, bool>((ref)
 
 // Create a provider for user details that depends on the current user account
 final currentUserDetailsProvider = FutureProvider.autoDispose((ref) async {
-  // Watch the current user account
   final currentUserAccount = await ref.watch(currentUserAccountProvider.future);
   
-  // If there's no current user account, return null without logging
   if (currentUserAccount == null) {
     return null;
   }
   
-  print('currentUserDetailsProvider: Found user account with ID: ${currentUserAccount.$id}');
-  
   final userAPI = ref.watch(userAPIProvider);
-  print('currentUserDetailsProvider: Attempting to fetch user data with ID: ${currentUserAccount.$id}');
   final userDataResult = await userAPI.getUserData(currentUserAccount.$id);
   
   return userDataResult.fold(
-    (failure) {
-      print('currentUserDetailsProvider: Error getting user details: ${failure.massage}');
-      print('currentUserDetailsProvider: Full error object: $failure');
-      return null;
-    },
-    (document) {
-      print('currentUserDetailsProvider: Successfully got document: ${document.data}');
-      return UserModel.fromMap(document.data);
-    },
+    (failure) => null,
+    (document) => UserModel.fromMap(document.data),
   );
 });
 
@@ -95,11 +83,8 @@ class AuthController extends StateNotifier<bool> {
     state = true;
     try {
       await _authAPI.logout();
-      // Clear any cached user data
       _ref.invalidate(currentUserDetailsProvider);
       _ref.invalidate(currentUserAccountProvider);
-    } catch (e) {
-      print('Error during logout: $e');
     } finally {
       state = false;
     }
@@ -139,7 +124,6 @@ class AuthController extends StateNotifier<bool> {
         },
         (r) async {
           try {
-            print('Auth user created with ID: ${r.$id}'); // Debug log
             UserModel userModel = UserModel(
               email: email,
               name: getNameFromEmail(email),
@@ -179,7 +163,6 @@ class AuthController extends StateNotifier<bool> {
   }) async {
     state = true;
     try {
-      // Clear any existing state
       _ref.invalidate(currentUserDetailsProvider);
       _ref.invalidate(currentUserAccountProvider);
 
@@ -195,25 +178,19 @@ class AuthController extends StateNotifier<bool> {
         },
         (r) async {
           try {
-            // Wait a moment for the session to be established
             await Future.delayed(const Duration(milliseconds: 500));
             
-            // Get current user after login
             final currentUser = await _authAPI.currentUserAccount();
             if (currentUser != null) {
-              print('Logged in user ID: ${currentUser.$id}'); // Debug log
-              // Verify we can get the user data
               final userDataResult = await _userAPI.getUserData(currentUser.$id);
               
               userDataResult.fold(
                 (failure) async {
-                  print('Error getting user data: ${failure.massage}');
                   if (!context.mounted) return;
                   showSnackBar(context, 'Error accessing user data: ${failure.massage}');
                   await logout();
                 },
                 (userData) {
-                  // Force refresh the providers
                   _ref.invalidate(currentUserDetailsProvider);
                   _ref.invalidate(currentUserAccountProvider);
                   
@@ -230,7 +207,6 @@ class AuthController extends StateNotifier<bool> {
               await logout();
             }
           } catch (e) {
-            print('Error during login process: $e');
             if (!context.mounted) return;
             showSnackBar(context, 'An error occurred during login');
             await logout();
@@ -239,7 +215,6 @@ class AuthController extends StateNotifier<bool> {
         },
       );
     } catch (e) {
-      print('Login error: $e');
       showSnackBar(context, 'An error occurred: $e');
       state = false;
     }

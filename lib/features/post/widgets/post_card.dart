@@ -67,7 +67,86 @@ class PostCard extends ConsumerWidget {
                     ),
                   ],
                 ),
-                HashtagText(text: post.text),
+                if (post.text != null && post.text!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: HashtagText(text: post.text!),
+                  ),
+                
+                // Display the BeReal-style photos
+                AspectRatio(
+                  aspectRatio: 1,
+                  child: Stack(
+                    children: [
+                      // Main background photo (rear camera)
+                      Image.network(
+                        post.rearCameraPhotoUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        errorBuilder: (context, error, stackTrace) => 
+                          Container(
+                            color: Colors.grey.shade300,
+                            child: const Center(child: Text('Image not available')),
+                          ),
+                      ),
+                      
+                      // Front camera photo overlay
+                      Positioned(
+                        right: 16,
+                        bottom: 16,
+                        width: 120,
+                        height: 160,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white, width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.network(
+                              post.frontCameraPhotoUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => 
+                                Container(
+                                  color: Colors.grey.shade200,
+                                  child: const Center(child: Text('Selfie not available')),
+                                ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Action buttons
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.comment_outlined,
+                          size: 20,
+                        ),
+                      ),
+                      Text('${post.commentIds.length}'),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.favorite_outline,
+                          size: 20,
+                        ),
+                      ),
+                      Text('${post.likes.length}'),
+                    ],
+                  ),
+                ),
+                
+                const Divider(),
               ],
             );
           },

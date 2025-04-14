@@ -1,189 +1,341 @@
 import 'dart:io';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:moveo/common/common.dart';
-import 'package:moveo/constants/constants.dart';
-import 'package:moveo/core/utils.dart';
-import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/features/post/controller/post_controller.dart';
-import 'package:moveo/theme/pallete.dart';
+import 'package:moveo/core/utils.dart';
 
-class CreatePostScreen extends ConsumerStatefulWidget {
+class CreatePostView extends ConsumerStatefulWidget {
   static route() => MaterialPageRoute(
-        builder: (context) => const CreatePostScreen(),
-      );
-  const CreatePostScreen({super.key});
+    builder: (context) => const CreatePostView(),
+  );
+
+  const CreatePostView({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CreatePostScreenState();
+  ConsumerState<CreatePostView> createState() => _CreatePostViewState();
 }
 
-class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
-  final postTextController = TextEditingController();
-  List<File> images = [];
+class _CreatePostViewState extends ConsumerState<CreatePostView> {
+  CameraController? _cameraController;
+  List<CameraDescription>? _cameras;
+  bool _isRearCamera = true;
+  File? _rearPhoto;
+  File? _frontPhoto;
+  bool _isLoading = true;
+  final TextEditingController _textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    setState(() => _isLoading = true);
+    
+    try {
+      // Get available cameras
+      _cameras = await availableCameras();
+      if (_cameras == null || _cameras!.isEmpty) {
+        if (mounted) {
+          showSnackBar(context, 'No cameras found on this device');
+          setState(() => _isLoading = false);
+        }
+        return;
+      }
+
+      // Initialize with rear camera first
+      await _setupCamera(_isRearCamera);
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, 'Error initializing camera: $e');
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _setupCamera(bool useRearCamera) async {
+    if (_cameras == null || _cameras!.isEmpty) return;
+
+    // Clean up previous controller if it exists
+    if (_cameraController != null) {
+      await _cameraController!.dispose();
+      _cameraController = null;
+    }
+
+    try {
+      // Find the right camera
+      CameraDescription? camera;
+      if (_cameras!.length == 1) {
+        // Only one camera available, use it regardless
+        camera = _cameras![0];
+      } else {
+        // Try to find the requested camera type
+        for (var cam in _cameras!) {
+          if ((useRearCamera && cam.lensDirection == CameraLensDirection.back) ||
+              (!useRearCamera && cam.lensDirection == CameraLensDirection.front)) {
+            camera = cam;
+            break;
+          }
+        }
+        // Fall back to the first camera if we couldn't find the right one
+        camera ??= _cameras![0];
+      }
+
+      // Create and initialize the controller
+      _cameraController = CameraController(
+        camera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.jpeg,
+      );
+
+      await _cameraController!.initialize();
+      
+      if (mounted) {
+        setState(() {
+          _isRearCamera = useRearCamera;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, 'Failed to initialize camera: $e');
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _takePicture() async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized || _isLoading) {
+      showSnackBar(context, 'Camera is not ready');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    
+    try {
+      final XFile picture = await _cameraController!.takePicture();
+      
+      if (_isRearCamera) {
+        _rearPhoto = File(picture.path);
+      } else {
+        _frontPhoto = File(picture.path);
+      }
+      
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, 'Error taking picture: $e');
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+  
+  Future<void> _switchCamera() async {
+    if (_isLoading) return;
+    
+    setState(() => _isLoading = true);
+    await _setupCamera(!_isRearCamera);
+  }
+
+  void _sharePost() {
+    if (_rearPhoto == null || _frontPhoto == null) {
+      showSnackBar(context, 'Please take both front and rear photos');
+      return;
+    }
+    
+    try {
+      ref.read(postControllerProvider.notifier).sharePost(
+        rearCameraPhoto: _rearPhoto!,
+        frontCameraPhoto: _frontPhoto!,
+        text: _textController.text.isNotEmpty ? _textController.text.trim() : null,
+        context: context,
+      );
+    } catch (e) {
+      showSnackBar(context, 'Error sharing post: $e');
+    }
+  }
 
   @override
   void dispose() {
+    _cameraController?.dispose();
+    _textController.dispose();
     super.dispose();
-    postTextController.dispose();
-  }
-
-  void sharePost() {
-    ref.read(postControllerProvider.notifier).sharePost(
-      images: images,
-       text: postTextController.text,
-        context: context,
-        );
-  }
-
-  void onPickImages() async {
-    final selectedImages = await pickMultiImages();
-    setState(() {
-      images = selectedImages;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUserAsync = ref.watch(currentUserDetailsProvider);
-    final currentUserAccount = ref.watch(currentUserAccountProvider);
+    final bool isCapturingComplete = _rearPhoto != null && _frontPhoto != null;
+    final bool isPostingLoading = ref.watch(postControllerProvider);
     
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-           icon: const Icon(Icons.close, size: 30,)
-           ),
-           actions: [
-            RoundedSmallButton(
-              onTap: sharePost,
-             label: 'Post',
-             backgroundColor: Pallete.whiteColor,
-             textColor: Pallete.backgroundColor,
-             )
-           ],
+        title: Text(_isRearCamera 
+          ? (_rearPhoto == null ? 'Take Rear Photo' : 'Rear Photo Taken') 
+          : (_frontPhoto == null ? 'Take Front Photo' : 'Front Photo Taken')),
+        actions: [
+          if (isCapturingComplete)
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: !isPostingLoading ? _sharePost : null,
+            ),
+        ],
       ),
-      body: currentUserAsync.when(
-        data: (currentUser) {
-          if (currentUser == null) {
-            return currentUserAccount.when(
-              data: (account) => account == null
-                ? const Center(
-                    child: Text('Please log in to create a post'),
-                  )
-                : const Center(
-                    child: CircularProgressIndicator(),
+      body: _isLoading || _cameraController == null || !_cameraController!.value.isInitialized
+        ? const Center(child: CircularProgressIndicator())
+        : Column(
+            children: [
+              // Preview area
+              Expanded(
+                child: _rearPhoto != null && _frontPhoto != null
+                  ? _buildPostPreview()
+                  : _buildCameraPreview(),
+              ),
+              
+              // Text input (only when both photos are taken)
+              if (isCapturingComplete)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextField(
+                    controller: _textController,
+                    decoration: const InputDecoration(
+                      hintText: 'Add a caption (optional)',
+                      border: OutlineInputBorder(),
+                      fillColor: Colors.white,
+                      filled: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    maxLines: 3,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    autofocus: false,
+                    onChanged: (value) {
+                      // Force a rebuild to ensure text is captured
+                      setState(() {});
+                    },
                   ),
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
+                ),
+              
+              // Photo info
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Chip(
+                      label: Text('Rear: ${_rearPhoto != null ? "✓" : "×"}'),
+                      backgroundColor: _rearPhoto != null ? Colors.green.shade100 : Colors.red.shade100,
+                    ),
+                    const SizedBox(width: 8),
+                    Chip(
+                      label: Text('Front: ${_frontPhoto != null ? "✓" : "×"}'),
+                      backgroundColor: _frontPhoto != null ? Colors.green.shade100 : Colors.red.shade100,
+                    ),
+                  ],
+                ),
               ),
-              error: (_, __) => const Center(
-                child: Text('Please log in to create a post'),
-              ),
-            );
-          }
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(currentUser.profilePic),
-                        radius: 30,
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: TextField(
-                          controller: postTextController,
-                          style: const TextStyle(
-                            fontSize: 22,
-                          ),
-                          decoration: const InputDecoration(
-                            hintText: "Write something fun!",
-                            hintStyle: TextStyle(
-                              color: Pallete.greyColor,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          maxLines: null,
-                        ),
-                      ),
-                    ],
+            ],
+          ),
+      bottomNavigationBar: _isLoading || isPostingLoading
+        ? const LinearProgressIndicator()
+        : Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (!isCapturingComplete)
+                  FloatingActionButton(
+                    heroTag: 'take_photo',
+                    onPressed: _takePicture,
+                    child: const Icon(Icons.camera),
                   ),
-                  if(images.isNotEmpty)
-                  CarouselSlider(
-                    items: images
-                    .map(
-                      (file) { return Container(
-                          width: MediaQuery.of(context).size.width,
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                          ),
-                          child: Image.file(file));},
-                   )
-                   .toList(),
-                   options: CarouselOptions(
-                    height: 400,
-                    enableInfiniteScroll: false,
-                   )
-                   ),
-                ],
-              ),
+                if (!isCapturingComplete)
+                  FloatingActionButton(
+                    heroTag: 'switch_camera',
+                    onPressed: _switchCamera,
+                    child: Icon(_isRearCamera ? Icons.camera_front : Icons.camera_rear),
+                  ),
+                if (isCapturingComplete)
+                  FloatingActionButton(
+                    heroTag: 'retake_photos',
+                    onPressed: () {
+                      setState(() {
+                        _rearPhoto = null;
+                        _frontPhoto = null;
+                      });
+                      _initializeCamera();
+                    },
+                    child: const Icon(Icons.refresh),
+                  ),
+                if (isCapturingComplete)
+                  FloatingActionButton(
+                    heroTag: 'share_post',
+                    onPressed: _sharePost,
+                    child: const Icon(Icons.send),
+                  ),
+              ],
             ),
-          );
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, _) => Center(
-          child: Text('Error: $error'),
+          ),
+    );
+  }
+  
+  Widget _buildCameraPreview() {
+    return ClipRect(
+      child: SizedBox(
+        width: double.infinity,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _cameraController!.value.previewSize!.height,
+            height: _cameraController!.value.previewSize!.width,
+            child: CameraPreview(_cameraController!),
+          ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(bottom: 10),
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: Pallete.greyColor,
-              width: 0.3,
-            )
-          )
+    );
+  }
+  
+  Widget _buildPostPreview() {
+    return Column(
+      children: [
+        Expanded(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Main (rear) photo
+              Image.file(
+                _rearPhoto!,
+                fit: BoxFit.cover,
+              ),
+              
+              // Selfie overlay
+              Positioned(
+                right: 16,
+                bottom: 16,
+                width: 120,
+                height: 160,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.file(
+                      _frontPhoto!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0).copyWith(
-                left: 15,
-                right: 15,
-              ),
-              child: GestureDetector( 
-                onTap: onPickImages ,
-                child: SvgPicture.asset(AssetsConstants.SearchIcon)),
-            ),
-             Padding(
-              padding: const EdgeInsets.all(8.0).copyWith(
-                left: 15,
-                right: 15,
-              ),
-              child: SvgPicture.asset(AssetsConstants.UpIcon),
-            ),
-             Padding(
-              padding: const EdgeInsets.all(8.0).copyWith(
-                left: 15,
-                right: 15,
-              ),
-              child: SvgPicture.asset(AssetsConstants.DownIcon),
-            )
-          ],
-        ),
-      ),
+      ],
     );
   }
 }

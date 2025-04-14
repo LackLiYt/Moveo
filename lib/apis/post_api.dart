@@ -15,6 +15,7 @@ final postAPIProvider = Provider((ref) {
 
 abstract class IPostAPI {
   FutureEither<Document> sharePost(Post post);
+  FutureEither<Document> sharePostData(Map<String, dynamic> data);
   Future<List<Document>> getPosts();
 }
 
@@ -26,7 +27,7 @@ class PostAPI implements IPostAPI {
     try {
         final document = await _db.createDocument(
         databaseId: AppwriteConstants.databaseId,
-        collectionId: AppwriteConstants.postTestCollectionId,
+        collectionId: AppwriteConstants.postCollectionId,
         documentId: ID.unique(),
         data: post.toMap(),
       );
@@ -41,10 +42,27 @@ class PostAPI implements IPostAPI {
   }
 
   @override
+  FutureEither<Document> sharePostData(Map<String, dynamic> data) async {
+    try {
+      final document = await _db.createDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.postCollectionId,
+        documentId: ID.unique(),
+        data: data,
+      );
+      return right(document);
+    } on AppwriteException catch (e, st) {
+      return left(Failure(e.message ?? 'Error creating post', st));
+    } catch (e, st) {
+      return left(Failure(e.toString(), st));
+    }
+  }
+
+  @override
   Future<List<Document>> getPosts() async {
       final documents = await _db.listDocuments(
         databaseId: AppwriteConstants.databaseId,
-        collectionId: AppwriteConstants.postTestCollectionId,
+        collectionId: AppwriteConstants.postCollectionId,
       );
       return documents.documents;
   }

@@ -40,16 +40,12 @@ class AuthAPI implements IAuthAPI {
   @override
   Future<void> logout() async {
     try {
-      // Спочатку видалити всі сесії
       try {
         await _account.deleteSessions();
       } catch (e) {
-
-        // Якщо видалити всі сесії чомусь не виходить, то видаляємо цю сесію
         await _account.deleteSession(sessionId: 'current');
       }
     } catch (e) {
-      print('Logout error: $e');
       rethrow;
     }
   }
@@ -59,10 +55,8 @@ class AuthAPI implements IAuthAPI {
     try {
       return await _account.get();
     } on AppwriteException catch (e) {
-      print('Current user account error: $e');
       return null;
     } catch (e) {
-      print('Unexpected error in currentUserAccount: $e');
       return null;
     }
   }
@@ -97,14 +91,12 @@ class AuthAPI implements IAuthAPI {
      required String password
      }) async {
     try {
-      //Спочатку видалити всі існуючі сесії
       try {
         await _account.deleteSessions();
       } catch (e) {
-        print('Warning: Could not delete existing sessions: $e');
+        // Silently continue if we can't delete sessions
       }
 
-      // Тоді стоворити сесію
       final session = await _account.createEmailPasswordSession(
          email: email,
           password: password

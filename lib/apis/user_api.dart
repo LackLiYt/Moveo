@@ -25,7 +25,6 @@ class UserAPI implements IUserAPI {
   @override
   FutureEitherVoid saveUserData(UserModel userModel) async {
     try {
-      print('Creating user document with ID: ${userModel.uid}');
       await _db.createDocument(
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.usersCollectionId,
@@ -37,10 +36,8 @@ class UserAPI implements IUserAPI {
       );
       return right(null);
     } on AppwriteException catch (e, st) {
-      print('Error creating user document: ${e.message}');
       return left(Failure(e.message ?? 'Unexpected error occurred', st));
     } catch (e, st) {
-      print('Unexpected error creating user document: $e');
       return left(Failure(e.toString(), st));
     }
   }
@@ -48,20 +45,15 @@ class UserAPI implements IUserAPI {
   @override
   FutureEither<model.Document> getUserData(String uid) async {
     try {
-      print('Fetching user document with ID: $uid');
       final document = await _db.getDocument(
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.usersCollectionId,
         documentId: uid,
       );
-      print('Successfully fetched document: ${document.data}');
       return right(document);
     } on AppwriteException catch (e, st) {
-      print('AppwriteException in getUserData: ${e.message}');
-      print('Attempted to fetch with ID: $uid');
       return left(Failure(e.message ?? 'Error fetching user data', st));
     } catch (e, st) {
-      print('Unexpected error in getUserData: $e');
       return left(Failure(e.toString(), st));
     }
   }

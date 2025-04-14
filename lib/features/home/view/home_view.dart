@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
 import 'package:moveo/constants/ui_constants.dart';
 import 'package:moveo/features/post/views/create_post_view.dart';
+import 'package:moveo/features/post/views/post_view.dart';
 import 'package:moveo/features/account/accout_page.dart';
 
 class HomeView extends StatefulWidget {
@@ -26,7 +27,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void onCreatePost() {
-    Navigator.push(context, CreatePostScreen.route());
+    Navigator.push(context, CreatePostView.route());
   }
 
   void onAccount() {
