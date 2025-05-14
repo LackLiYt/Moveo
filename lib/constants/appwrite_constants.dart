@@ -6,6 +6,7 @@ class AppwriteConstants {
   static const String usersCollectionId = '6793ffd70014bf79247d';
   static const String postCollectionId = '679f890c0025ddf0c58b';
   static const String postTestCollectionId = '67faa053003587684a33';
+  static const String leaderboardCollectionId = '681b5a350024b878fecd';
 
 
   static const String imagesBucketId = '6796730c003d58e79e62';

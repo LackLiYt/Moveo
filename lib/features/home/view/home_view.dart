@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
 import 'package:moveo/constants/ui_constants.dart';
+import 'package:moveo/features/leaderboard/leaderboard_page_view.dart';
 import 'package:moveo/features/post/views/create_post_view.dart';
 import 'package:moveo/features/post/views/post_view.dart';
 import 'package:moveo/features/account/accout_page.dart';
@@ -34,6 +35,10 @@ class _HomeViewState extends State<HomeView> {
     Navigator.push(context, AccountPage.route());
   }
 
+  void onLeaderboard() {
+    Navigator.push(context, LeaderboardPageView.route());
+  }
+
   @override
   Widget build(BuildContext context) {
     // Use Theme to dynamically retrieve colors
@@ -62,6 +67,9 @@ class _HomeViewState extends State<HomeView> {
           } else if (index == 3) {
             // Account icon index
             onAccount();
+          } else if (index == 1) {
+            // Leaderboard icon index
+            onLeaderboard();
           } else {
             onPageChange(index);
           }
