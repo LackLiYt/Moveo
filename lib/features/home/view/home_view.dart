@@ -6,10 +6,13 @@ import 'package:moveo/constants/ui_constants.dart';
 import 'package:moveo/features/leaderboard/leaderboard_page_view.dart';
 import 'package:moveo/features/post/views/create_post_view.dart';
 import 'package:moveo/features/account/accout_page.dart';
+import 'package:moveo/features/health/health_data.dart';
+import 'package:health/health.dart';
+import 'dart:async';
 
 class HomeView extends StatefulWidget {
   static route() => MaterialPageRoute(
-        builder: (context) => const HomeView(),
+        builder: (context) => HomeView(),
       );
   const HomeView({super.key});
 
@@ -17,8 +20,73 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
+
+  @override
+  initState(){
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadInitialStepData();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+  Timer? _stepUpdateTimer;
+  final health = Health();
+
+  int _counter = 0;
+  int _getSteps = 0;
+
+  void _startPeriodicStepUpdates() {
+    _stopPeriodicStepUpdates();
+    print("Запускаємо таймер для оновлення кроків кожні 30 секунд");
+    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 70), (timer) {
+      print("Дані про кроки оновлено");
+    });
+  }
+
+  void _stopPeriodicStepUpdates() {
+    if (_stepUpdateTimer != null && _stepUpdateTimer!.isActive) {
+      print("Зупиняємо таймер оновлення кроків");
+      _stepUpdateTimer!.cancel();
+      _stepUpdateTimer = null;
+    }
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      print("Додаток активовано (resumed)");
+      _loadInitialStepData();
+      _startPeriodicStepUpdates();
+    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive || state == AppLifecycleState.hidden) {
+      print("Додаток згорнуто (paused)");
+      _stopPeriodicStepUpdates();
+    }
+  }
+
   int _page = 0;
+
+
+  Future<void> _loadInitialStepData() async {
+    // Викликаємо функцію з іншого файлу, передаючи наш екземпляр health
+    int? steps = await fetchStepData(health);
+
+    // Перевіряємо, чи віджет ще існує перед викликом setState
+    if (mounted) {
+      setState(() {
+        _getSteps = steps ?? 0; // Оновлюємо стан. Якщо steps = null, ставимо 0.
+      });
+    }
+  }
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
 
   void onPageChange(int index) {
     setState(() {
@@ -108,4 +176,12 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
+}
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+
 }

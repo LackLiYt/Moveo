@@ -69,13 +69,6 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Leaderboard:', style: theme.textTheme.titleLarge),
-              ),
-            ),
             const SizedBox(height: 8),
             TabBar(
               controller: _tabController,
@@ -125,10 +118,6 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
             }
             final data = snapshot.data!.getOrElse((_) => {});
             final docs = (data['documents'] as List<dynamic>? ?? []);
-            print('[DEBUG] Raw leaderboard docs:');
-            for (final doc in docs) {
-              print(doc);
-            }
             // Map to leaderboard entries with robust key fallback (using doc['data'])
             final leaderboard = docs.asMap().entries.map((entry) {
               final i = entry.key;
@@ -145,7 +134,7 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
                 'name': name,
                 'level': data['level'] ?? 1,
                 'steps': data['steps'] ?? 0,
-                'hours': 29, // Placeholder
+                'km': 29, // Changed from 'hours' to 'km'
                 'points': points,
               };
             }).toList();
@@ -162,7 +151,7 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
                   name: e['name'],
                   level: e['level'],
                   steps: e['steps'],
-                  hours: e['hours'],
+                  km: e['km'],
                   points: e['points'],
                   highlight: e['uid'] == currentUserId || e['rank'] <= 3,
                   highlightColor: e['rank'] == 1
@@ -183,7 +172,7 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
                       name: leaderboard[currentUserIndex]['name'],
                       level: leaderboard[currentUserIndex]['level'],
                       steps: leaderboard[currentUserIndex]['steps'],
-                      hours: leaderboard[currentUserIndex]['hours'],
+                      km: leaderboard[currentUserIndex]['km'],
                       points: leaderboard[currentUserIndex]['points'],
                       highlight: true,
                       highlightColor: Colors.lightBlueAccent.withOpacity(0.3),
@@ -200,17 +189,22 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
   }
 
   Widget _buildHeaderRow() {
+    // Define column widths for consistent alignment
+    const double rankWidth = 32;
+    const int nameFlex = 1; // Use flex for the name to take available space, changed to int
+    const double statWidth = 60; // Fixed width for stats (level, steps, hours, points)
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Row(
-        children: const [
-          SizedBox(width: 32, child: Text('#', style: TextStyle(fontWeight: FontWeight.bold))),
-          SizedBox(width: 8),
-          Expanded(child: Text('name', style: TextStyle(fontWeight: FontWeight.bold))),
-          _HeaderStat(label: 'level'),
-          _HeaderStat(label: 'steps'),
-          _HeaderStat(label: 'hours'),
-          _HeaderStat(label: 'points'),
+        children: [
+          SizedBox(width: rankWidth, child: Text('#', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          const SizedBox(width: 8), // Space between rank and name
+          Expanded(flex: nameFlex, child: Text('name', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          SizedBox(width: statWidth, child: Text('level', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          SizedBox(width: statWidth, child: Text('steps', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          SizedBox(width: statWidth, child: Text('km', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          SizedBox(width: statWidth, child: Text('points', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
         ],
       ),
     );

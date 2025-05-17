@@ -6,7 +6,7 @@ class LeaderboardCard extends StatelessWidget {
   final String name;
   final int level;
   final int steps;
-  final int hours;
+  final int km;
   final int points;
   final bool highlight;
   final Color? highlightColor;
@@ -17,7 +17,7 @@ class LeaderboardCard extends StatelessWidget {
     required this.name,
     required this.level,
     required this.steps,
-    required this.hours,
+    required this.km,
     required this.points,
     this.highlight = false,
     this.highlightColor,
@@ -62,6 +62,7 @@ class LeaderboardCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
+              flex: 1,
               child: Text(
                 name,
                 style: const TextStyle(
@@ -69,12 +70,13 @@ class LeaderboardCard extends StatelessWidget {
                   fontSize: 16,
                   color: Colors.black,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
-            _LeaderboardStat(label: 'Lvl', value: level.toString(), theme: theme),
-            _LeaderboardStat(label: 'Steps', value: steps.toString(), theme: theme),
-            _LeaderboardStat(label: 'Hours', value: hours.toString(), theme: theme),
-            _LeaderboardStat(label: 'Pts', value: points.toString(), theme: theme),
+            SizedBox(width: 60, child: _LeaderboardStat(value: level.toString(), theme: theme)),
+            SizedBox(width: 60, child: _LeaderboardStat(value: steps.toString(), theme: theme)),
+            SizedBox(width: 60, child: _LeaderboardStat(value: km.toString(), theme: theme)),
+            SizedBox(width: 60, child: _LeaderboardStat(value: points.toString(), theme: theme)),
           ],
         ),
       ),
@@ -83,12 +85,10 @@ class LeaderboardCard extends StatelessWidget {
 }
 
 class _LeaderboardStat extends StatelessWidget {
-  final String label;
   final String value;
   final ThemeData theme;
 
   const _LeaderboardStat({
-    required this.label,
     required this.value,
     required this.theme,
   });
@@ -101,19 +101,13 @@ class _LeaderboardStat extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: theme.textTheme.bodySmall?.color,
-            ),
-          ),
-          Text(
             value,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 15,
               color: theme.textTheme.bodyLarge?.color,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
