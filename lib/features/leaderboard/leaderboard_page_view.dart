@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/apis/progress_api.dart';
 import 'package:moveo/features/leaderboard/widgets/leaderboard_card.dart';
-import 'package:moveo/models/user_model.dart';
 import 'package:moveo/theme/pallete.dart';
+import 'package:moveo/features/auth/controller/auth_controller.dart';
+
 
 class LeaderboardPageView extends ConsumerStatefulWidget {
   static route() => MaterialPageRoute(
         builder: (context) => const LeaderboardPageView(),
       );
 
-  const LeaderboardPageView({Key? key}) : super(key: key);
+  const LeaderboardPageView({super.key});
 
   @override
   ConsumerState<LeaderboardPageView> createState() => _LeaderboardPageViewState();
@@ -19,6 +20,7 @@ class LeaderboardPageView extends ConsumerStatefulWidget {
 class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int currentTab = 0;
+  Key _refreshKey = UniqueKey();
 
   @override
   void initState() {
@@ -47,6 +49,17 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
         elevation: 0,
         title: Text('LeaderBoard', style: theme.textTheme.titleMedium),
         centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: () {
+              setState(() {
+                _refreshKey = UniqueKey();
+              });
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -95,88 +108,94 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
 
   Widget _buildWorldTab() {
     final progressAPI = ref.watch(progressAPIProvider);
-    // Replace with actual current user info
-    final String currentUserId = 'arsenantoshko'; // TODO: get from auth
-    return FutureBuilder(
-      future: progressAPI.getLeaderboard(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (!snapshot.hasData || snapshot.data!.isLeft()) {
-          return const Center(child: Text('Failed to load leaderboard'));
-        }
-        final data = snapshot.data!.getOrElse((_) => {});
-        final docs = (data['documents'] as List<dynamic>? ?? []);
-        // Map to leaderboard entries
-        final leaderboard = docs.asMap().entries.map((entry) {
-          final i = entry.key;
-          final doc = entry.value;
-          return {
-            'rank': i + 1,
-            'uid': doc['uid'] ?? '',
-            'name': doc['name'] ?? '',
-            'level': doc['level'] ?? 1,
-            'steps': doc['steps'] ?? 0,
-            'hours': 29, // Placeholder
-            'points': doc['points'] ?? 0,
-          };
-        }).toList();
-        // Find current user
-        final currentUserIndex = leaderboard.indexWhere((e) => e['uid'] == currentUserId);
-        List<Map<String, dynamic>> displayList = [];
-        if (leaderboard.length <= 5) {
-          displayList = leaderboard;
-        } else {
-          displayList = leaderboard.take(5).toList();
-          if (currentUserIndex >= 5 || currentUserIndex == -1) {
-            // Replace 5th with current user
-            if (currentUserIndex != -1) {
-              displayList[4] = leaderboard[currentUserIndex];
-            } else {
-              // If not found, just show top 5
+    final currentUserAsync = ref.watch(currentUserDetailsProvider);
+
+    return currentUserAsync.when(
+      data: (currentUser) {
+        final String currentUserId = currentUser?.uid ?? '';
+        return FutureBuilder(
+          key: _refreshKey,
+          future: progressAPI.getLeaderboard(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
             }
-          }
-        }
-        return ListView(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          children: [
-            _buildHeaderRow(),
-            ...displayList.map((e) => LeaderboardCard(
-              rank: e['rank'],
-              name: e['name'],
-              level: e['level'],
-              steps: e['steps'],
-              hours: e['hours'],
-              points: e['points'],
-              highlight: e['uid'] == currentUserId || e['rank'] <= 3,
-              highlightColor: e['uid'] == currentUserId
-                  ? Colors.lightBlueAccent.withOpacity(0.3)
-                  : (e['rank'] == 1
-                      ? Colors.yellow.withOpacity(0.4)
-                      : (e['rank'] == 2
-                          ? Colors.orange.withOpacity(0.2)
-                          : (e['rank'] == 3
-                              ? Colors.amber.withOpacity(0.2)
-                              : null))),
-            )),
-            if (currentUserIndex >= 5)
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: LeaderboardCard(
-                  rank: leaderboard[currentUserIndex]['rank'],
-                  name: leaderboard[currentUserIndex]['name'],
-                  level: leaderboard[currentUserIndex]['level'],
-                  steps: leaderboard[currentUserIndex]['steps'],
-                  hours: leaderboard[currentUserIndex]['hours'],
-                  points: leaderboard[currentUserIndex]['points'],
-                  highlight: true,
-                  highlightColor: Colors.lightBlueAccent.withOpacity(0.3),
-                ),
-              ),
-          ],
+            if (!snapshot.hasData || snapshot.data!.isLeft()) {
+              return const Center(child: Text('Failed to load leaderboard'));
+            }
+            final data = snapshot.data!.getOrElse((_) => {});
+            final docs = (data['documents'] as List<dynamic>? ?? []);
+            print('[DEBUG] Raw leaderboard docs:');
+            for (final doc in docs) {
+              print(doc);
+            }
+            // Map to leaderboard entries with robust key fallback (using doc['data'])
+            final leaderboard = docs.asMap().entries.map((entry) {
+              final i = entry.key;
+              final doc = entry.value;
+              final data = doc['data'] ?? {};
+              final uid = data['uid'] ?? data['userId'] ?? '';
+              final name = (data['name'] == null || (data['name'] is String && data['name'].toString().isEmpty))
+                ? (currentUser != null && uid == currentUser.uid ? currentUser.name : 'User')
+                : data['name'];
+              final points = data['points'] ?? 0;
+              return {
+                'rank': i + 1,
+                'uid': uid,
+                'name': name,
+                'level': data['level'] ?? 1,
+                'steps': data['steps'] ?? 0,
+                'hours': 29, // Placeholder
+                'points': points,
+              };
+            }).toList();
+            // Find current user
+            final currentUserIndex = leaderboard.indexWhere((e) => e['uid'] == currentUserId);
+            // Show all users for debugging
+            final displayList = leaderboard;
+            return ListView(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              children: [
+                _buildHeaderRow(),
+                ...displayList.map((e) => LeaderboardCard(
+                  rank: e['rank'],
+                  name: e['name'],
+                  level: e['level'],
+                  steps: e['steps'],
+                  hours: e['hours'],
+                  points: e['points'],
+                  highlight: e['uid'] == currentUserId || e['rank'] <= 3,
+                  highlightColor: e['rank'] == 1
+                      ? Colors.yellow.withOpacity(0.4) // Gold background
+                      : e['rank'] == 2
+                          ? Colors.grey[400]?.withOpacity(0.4) // Silver shade
+                          : e['rank'] == 3
+                              ? Colors.brown[700]?.withOpacity(0.4) // Darker bronze shade
+                              : e['uid'] == currentUserId // Apply blue highlight only if current user and not in top 3
+                                  ? Colors.lightBlueAccent.withOpacity(0.3)
+                                  : null,
+                )),
+                if (currentUserIndex >= 5)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: LeaderboardCard(
+                      rank: leaderboard[currentUserIndex]['rank'],
+                      name: leaderboard[currentUserIndex]['name'],
+                      level: leaderboard[currentUserIndex]['level'],
+                      steps: leaderboard[currentUserIndex]['steps'],
+                      hours: leaderboard[currentUserIndex]['hours'],
+                      points: leaderboard[currentUserIndex]['points'],
+                      highlight: true,
+                      highlightColor: Colors.lightBlueAccent.withOpacity(0.3),
+                    ),
+                  ),
+              ],
+            );
+          },
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => const Center(child: Text('Failed to load user')),
     );
   }
 

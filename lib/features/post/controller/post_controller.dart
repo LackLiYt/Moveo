@@ -6,6 +6,8 @@ import 'package:moveo/apis/storage_api.dart';
 import 'package:moveo/core/utils.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/models/post_model.dart';
+import 'package:moveo/features/progress/controller/progress_controller.dart';
+import 'package:moveo/models/user_model.dart';
 
 final postControllerProvider = StateNotifierProvider<PostController, bool>((ref) {
   return PostController(
@@ -113,12 +115,24 @@ class PostController extends StateNotifier<bool> {
       debugPrint('Post data: ${post.toMap()}');
 
       final res = await _postAPI.sharePost(post);
+      
       if (mounted) {
         res.fold(
           (l) => showSnackBar(context, l.massage),
-          (r) {
-            showSnackBar(context, 'Post shared successfully!');
-            Navigator.pop(context); // Close the post creation screen
+          (r) async {
+            // Get current user model
+            final userModel = await _ref.read(getUserDetailsByIdProvider(userId).future);
+            userModel.fold(
+              (l) => showSnackBar(context, 'Error updating progress: ${l.massage}'),
+              (document) async {
+                // Convert document to UserModel
+                final user = UserModel.fromMap(document.data);
+                // Update user progress for creating a post
+                await _ref.read(progressControllerProvider.notifier).updateProgressForPost(user);
+                showSnackBar(context, 'Post shared successfully!');
+                Navigator.pop(context); // Close the post creation screen
+              },
+            );
           },
         );
       }

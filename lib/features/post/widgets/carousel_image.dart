@@ -12,7 +12,7 @@ class CarouselImage extends StatefulWidget {
 }
 
 class _CarouselImageState extends State<CarouselImage> {
-  int _current = 0;
+  final int _current = 0;
   @override
   Widget build(BuildContext context) {
     return const Stack(

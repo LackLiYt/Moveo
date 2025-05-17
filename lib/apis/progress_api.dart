@@ -47,6 +47,7 @@ class ProgressAPI implements IProgressAPI {
   @override
   FutureEitherVoid updateLeaderboard(UserModel user) async {
     try {
+      print('[DEBUG] updateLeaderboard called with user: uid=${user.uid}, name=${user.name}, points=${user.points}, level=${user.level}');
       // Check if user exists in leaderboard
       try {
         await _db.getDocument(
@@ -66,6 +67,7 @@ class ProgressAPI implements IProgressAPI {
             'level': user.level,
           },
         );
+        print('[DEBUG] Updated leaderboard entry for uid=${user.uid}');
       } catch (e) {
         // Create new leaderboard entry if user doesn't exist
         await _db.createDocument(
@@ -80,11 +82,14 @@ class ProgressAPI implements IProgressAPI {
             'steps': 0, // Initialize steps to 0
           },
         );
+        print('[DEBUG] Created new leaderboard entry for uid=${user.uid}');
       }
       return right(null);
     } on AppwriteException catch (e, st) {
+      print('[DEBUG] AppwriteException in updateLeaderboard: ${e.message}');
       return left(Failure(e.message ?? 'Error updating leaderboard', st));
     } catch (e, st) {
+      print('[DEBUG] Exception in updateLeaderboard: $e');
       return left(Failure(e.toString(), st));
     }
   }

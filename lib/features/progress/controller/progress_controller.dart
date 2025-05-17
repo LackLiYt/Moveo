@@ -4,7 +4,6 @@ import 'package:moveo/features/progress/models/daily_challenge.dart';
 import 'package:moveo/features/progress/models/level_benefits.dart';
 import 'package:moveo/features/progress/services/progress_service.dart';
 import 'package:moveo/apis/progress_api.dart';
-import 'package:moveo/core/utils.dart';
 
 final progressControllerProvider = StateNotifierProvider<ProgressController, AsyncValue<UserModel?>>((ref) {
   return ProgressController(
@@ -81,6 +80,7 @@ class ProgressController extends StateNotifier<AsyncValue<UserModel?>> {
   // Helper method to sync progress with Appwrite
   Future<void> _syncProgressWithAppwrite(UserModel user) async {
     try {
+      print('[DEBUG] _syncProgressWithAppwrite: user=${user.toString()}');
       // Update user progress in users collection
       final userResult = await _progressAPI.updateUserProgress(user);
       userResult.fold(

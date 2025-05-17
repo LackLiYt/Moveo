@@ -86,11 +86,9 @@ class MyApp extends ConsumerWidget {
         return MediaQuery(
           // Ensure consistent text scaling across devices
           data: MediaQuery.of(context).copyWith(
-            textScaleFactor: MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
-            // Ensure proper padding for notches and system UI
             padding: MediaQuery.of(context).padding,
             // Handle safe areas properly
-            viewInsets: MediaQuery.of(context).viewInsets,
+            viewInsets: MediaQuery.of(context).viewInsets, textScaler: TextScaler.linear(MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2)),
           ),
           child: child!,
         );

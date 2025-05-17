@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/models/user_model.dart';
 import 'package:moveo/features/progress/controller/progress_controller.dart';
 import 'package:moveo/features/progress/models/level_benefits.dart';
-import 'package:moveo/features/progress/models/daily_challenge.dart';
 
 class ProgressView extends ConsumerWidget {
   const ProgressView({super.key});

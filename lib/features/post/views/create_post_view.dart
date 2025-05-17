@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,12 +57,12 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
   }
 
   Future<void> _setupCamera(bool useRearCamera) async {
-    if (_cameras == null || _cameras!.isEmpty) return;
-
-    // Clean up previous controller if it exists
-    if (_cameraController != null) {
-      await _cameraController!.dispose();
-      _cameraController = null;
+    if (_cameras == null || _cameras!.isEmpty) {
+      if (mounted) {
+        showSnackBar(context, 'No cameras available');
+        setState(() => _isLoading = false);
+      }
+      return;
     }
 
     try {
@@ -83,7 +84,7 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
         camera ??= _cameras![0];
       }
 
-      // Create and initialize the controller
+      // Create and initialize the controller with error handling
       _cameraController = CameraController(
         camera,
         ResolutionPreset.medium,
@@ -91,7 +92,13 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
         imageFormatGroup: ImageFormatGroup.jpeg,
       );
 
-      await _cameraController!.initialize();
+      // Add timeout to initialization
+      await _cameraController!.initialize().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          throw TimeoutException('Camera initialization timed out');
+        },
+      );
       
       if (mounted) {
         setState(() {
@@ -104,6 +111,8 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
         showSnackBar(context, 'Failed to initialize camera: $e');
         setState(() => _isLoading = false);
       }
+      // Re-throw to be handled by the caller
+      rethrow;
     }
   }
 
@@ -139,7 +148,30 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
     if (_isLoading) return;
     
     setState(() => _isLoading = true);
-    await _setupCamera(!_isRearCamera);
+    
+    try {
+      // Properly dispose of the current controller
+      if (_cameraController != null) {
+        await _cameraController!.dispose();
+        _cameraController = null;
+      }
+      
+      // Add a small delay to ensure proper cleanup
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      // Initialize the new camera
+      await _setupCamera(!_isRearCamera);
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, 'Failed to switch camera: $e');
+        // Try to recover by reinitializing the current camera
+        await _setupCamera(_isRearCamera);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   void _sharePost() {

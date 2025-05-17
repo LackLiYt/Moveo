@@ -12,7 +12,7 @@ class LeaderboardCard extends StatelessWidget {
   final Color? highlightColor;
 
   const LeaderboardCard({
-    Key? key,
+    super.key,
     required this.rank,
     required this.name,
     required this.level,
@@ -21,11 +21,18 @@ class LeaderboardCard extends StatelessWidget {
     required this.points,
     this.highlight = false,
     this.highlightColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    Color? getRankColor(int rank) {
+      if (rank == 1) return Colors.amber[700];
+      if (rank == 2) return Colors.grey[500];
+      if (rank == 3) return Colors.brown[400];
+      return Colors.black;
+    }
+    bool isTop3 = rank <= 3;
     return Card(
       color: highlight
           ? (highlightColor ?? Pallete.blueColor.withOpacity(0.2))
@@ -48,7 +55,7 @@ class LeaderboardCard extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: highlight ? (highlightColor ?? Pallete.blueColor) : theme.textTheme.bodyLarge?.color,
+                  color: isTop3 ? getRankColor(rank) : Colors.black,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -57,10 +64,10 @@ class LeaderboardCard extends StatelessWidget {
             Expanded(
               child: Text(
                 name,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
                   fontSize: 16,
-                  color: highlight ? (highlightColor ?? Pallete.blueColor) : theme.textTheme.bodyLarge?.color,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -94,18 +101,18 @@ class _LeaderboardStat extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: theme.textTheme.bodySmall?.color,
+            ),
+          ),
+          Text(
             value,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 15,
               color: theme.textTheme.bodyLarge?.color,
-            ),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: theme.textTheme.bodySmall?.color,
             ),
           ),
         ],
