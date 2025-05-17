@@ -8,20 +8,90 @@ import 'package:moveo/features/auth/view/login_page.dart';
 import 'package:moveo/features/auth/widgets/auth_field.dart';
 import 'package:moveo/features/auth/widgets/loginsignup_button.dart';
 import 'package:moveo/features/auth/widgets/moveo_title.dart';
+import 'package:health/health.dart';
+import 'dart:async';
+import 'package:moveo/features/health/health_data.dart';
+
 
 class SignUpPage extends ConsumerStatefulWidget {
-  static route() => MaterialPageRoute(builder: (context) => const SignUpPage());
+  static route() => MaterialPageRoute(builder: (context) => SignUpPage());
   const SignUpPage({super.key});
 
   @override
   ConsumerState<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends ConsumerState<SignUpPage> {
+class _SignUpPageState extends ConsumerState<SignUpPage> with  WidgetsBindingObserver{
+  @override
+  initState(){
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadInitialStepData();
+    _startPeriodicStepUpdates();
+  }
+
+
+  Timer? _stepUpdateTimer;
+  final health = Health();
+
+  int _counter = 0;
+  int _getSteps = 0;
+
+  void _startPeriodicStepUpdates() {
+    _stopPeriodicStepUpdates();
+    print("Запускаємо таймер для оновлення кроків кожні 30 секунд");
+    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      print("Дані про кроки оновлено");
+
+      _loadInitialStepData();
+    });
+  }
+
+  void _stopPeriodicStepUpdates() {
+    if (_stepUpdateTimer != null && _stepUpdateTimer!.isActive) {
+      print("Зупиняємо таймер оновлення кроків");
+      _stepUpdateTimer!.cancel();
+      _stepUpdateTimer = null;
+    }
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      print("Додаток активовано (resumed)");
+      _loadInitialStepData();
+      _startPeriodicStepUpdates();
+    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive || state == AppLifecycleState.hidden) {
+      print("Додаток згорнуто (paused)");
+      _stopPeriodicStepUpdates();
+    }
+  }
+
+  int _page = 0;
+
+
+  Future<void> _loadInitialStepData() async {
+    // Викликаємо функцію з іншого файлу, передаючи наш екземпляр health
+    int? steps = await fetchStepData(health);
+
+    // Перевіряємо, чи віджет ще існує перед викликом setState
+    if (mounted) {
+      setState(() {
+        _getSteps = steps ?? 0; // Оновлюємо стан. Якщо steps = null, ставимо 0.
+      });
+    }
+  }
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
   final emailController = TextEditingController();
   final passwordController= TextEditingController();
   @override
   void dispose(){
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
@@ -91,5 +161,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
       )
       
     );
+    
   }
+
+
 }

@@ -43,7 +43,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   void _startPeriodicStepUpdates() {
     _stopPeriodicStepUpdates();
     print("Запускаємо таймер для оновлення кроків кожні 30 секунд");
-    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 70), (timer) {
+    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       print("Дані про кроки оновлено");
     });
   }

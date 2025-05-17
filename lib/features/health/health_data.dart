@@ -21,12 +21,12 @@ import 'package:health/health.dart';
     if (requested){
       try{
         steps = await health.getTotalStepsInInterval(midnight, now);
+        print("Total number of steps: $steps");
         return steps;
       }catch(error){
         print("Error: $error");
       }
 
-      print("Total number of steps: $steps");
 
 
 
