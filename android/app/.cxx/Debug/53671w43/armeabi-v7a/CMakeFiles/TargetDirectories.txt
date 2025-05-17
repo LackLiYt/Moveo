@@ -1,0 +1,2 @@
+C:/Users/Nazar/Moveo/android/app/.cxx/Debug/53671w43/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Nazar/Moveo/android/app/.cxx/Debug/53671w43/armeabi-v7a/CMakeFiles/rebuild_cache.dir

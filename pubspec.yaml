@@ -34,6 +34,10 @@ dependencies:
   connectivity_plus: ^6.1.4
   device_info_plus: ^10.1.2
   package_info_plus: ^8.3.0
+  flutter_web_auth_2: ^4.1.0
+
+dependency_overrides:
+  flutter_web_auth_2: ^4.1.0
 
 dev_dependencies:
   flutter_test:
