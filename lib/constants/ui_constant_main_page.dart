@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
+import 'package:moveo/features/post/widgets/post_list.dart';
 import 'package:moveo/features/chat/views/chat_page_view.dart';
 
 class UiConstants {
   static AppBar appBar(BuildContext context) {
     return AppBar(
+      leading: IconButton(
+    icon: Icon(Icons.people_alt_outlined),
+    onPressed: () {
+      // Your back or custom action here
+    },
+  ),
       centerTitle: true, // Align title to the left
       title: SvgPicture.asset(
         // Dynamically choose the title asset based on the theme
@@ -32,4 +39,11 @@ class UiConstants {
       ],
     );
   }
+
+  static const List<Widget> bottomTabBarPages = [
+    PostList(),
+    Text('Public Screen'),
+    Text('Post Screen'),
+    Text('Account Screen'),
+  ];
 }

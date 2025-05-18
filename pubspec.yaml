@@ -60,6 +60,7 @@ flutter:
     - assets/twitter_icon.svg
     - assets/svgs/
     - assets/global_photos/
+    - assets/global_avatars/
 
   fonts:
     - family: Montserrat

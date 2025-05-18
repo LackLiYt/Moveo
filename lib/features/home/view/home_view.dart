@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
-import 'package:moveo/constants/ui_constants.dart';
+import 'package:moveo/constants/ui_constant_main_page.dart';
 import 'package:moveo/features/leaderboard/leaderboard_page_view.dart';
 import 'package:moveo/features/post/views/create_post_view.dart';
 import 'package:moveo/features/account/accout_page.dart';
