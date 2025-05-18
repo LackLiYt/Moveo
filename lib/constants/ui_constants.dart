@@ -1,24 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
+import 'package:moveo/features/post/widgets/post_list.dart';
+import 'package:moveo/features/chat/views/chat_page_view.dart';
 
 class UiConstants {
   static AppBar appBar(BuildContext context) {
     return AppBar(
-      centerTitle: true, // Center the title
+      centerTitle: false, // Align title to the left
       title: SvgPicture.asset(
         // Dynamically choose the title asset based on the theme
         Theme.of(context).brightness == Brightness.light
             ? AssetsConstants.MoveoTitleBlue
             : AssetsConstants.MoveoTitleBlack,
+        height: 24, // Make the title smaller
       ),
+      actions: [
+        IconButton(
+          icon: Icon(
+            Icons.chat_bubble_outline,
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.black
+                : Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const ChatPageView(),
+            ));
+          },
+        ),
+        const SizedBox(width: 8), // Add some padding
+      ],
     );
   }
 
-  static List<Widget> bottomTabBarPages = [
-    const Text('Home Screen'),
-    const Text('Public Screen'),
-    const Text('Post Screen'),
-    const Text('Account Screen'),
+  static const List<Widget> bottomTabBarPages = [
+    PostList(),
+    Text('Public Screen'),
+    Text('Post Screen'),
+    Text('Account Screen'),
   ];
 }

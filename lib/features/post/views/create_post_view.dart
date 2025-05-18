@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/features/post/controller/post_controller.dart';
 import 'package:moveo/core/utils.dart';
+import 'package:moveo/theme/pallete.dart';
 
 class CreatePostView extends ConsumerStatefulWidget {
   static route() => MaterialPageRoute(
@@ -234,12 +235,18 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                   padding: const EdgeInsets.all(16.0),
                   child: TextField(
                     controller: _textController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Add a caption (optional)',
-                      border: OutlineInputBorder(),
-                      fillColor: Colors.white,
+                      border: const OutlineInputBorder(),
+                      fillColor: Theme.of(context).brightness == Brightness.dark ? Pallete.backgroundColor : Pallete.whiteColor,
                       filled: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      hintStyle: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark ? Pallete.greyColor : Pallete.darkGreyColor,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
                     ),
                     maxLines: 3,
                     keyboardType: TextInputType.multiline,

@@ -30,13 +30,13 @@ class LeaderboardCard extends StatelessWidget {
       if (rank == 1) return Colors.amber[700];
       if (rank == 2) return Colors.grey[500];
       if (rank == 3) return Colors.brown[400];
-      return Colors.black;
+      return theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor;
     }
     bool isTop3 = rank <= 3;
     return Card(
       color: highlight
           ? (highlightColor ?? Pallete.blueColor.withOpacity(0.2))
-          : theme.cardTheme.color,
+          : theme.brightness == Brightness.dark ? Pallete.backgroundColor : Pallete.whiteColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: highlight
@@ -55,7 +55,7 @@ class LeaderboardCard extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: isTop3 ? getRankColor(rank) : Colors.black,
+                  color: isTop3 ? getRankColor(rank) : (theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -65,10 +65,10 @@ class LeaderboardCard extends StatelessWidget {
               flex: 1,
               child: Text(
                 name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.normal,
                   fontSize: 16,
-                  color: Colors.black,
+                  color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -105,7 +105,7 @@ class _LeaderboardStat extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 15,
-              color: theme.textTheme.bodyLarge?.color,
+              color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
             ),
             textAlign: TextAlign.center,
           ),

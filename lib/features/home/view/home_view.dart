@@ -43,7 +43,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   void _startPeriodicStepUpdates() {
     _stopPeriodicStepUpdates();
     print("Запускаємо таймер для оновлення кроків кожні 30 секунд");
-    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 70), (timer) {
       print("Дані про кроки оновлено");
     });
   }
@@ -87,6 +87,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     setState(() {
       _counter++;
     });
+  }
 
   void onPageChange(int index) {
     setState(() {
@@ -117,7 +118,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
 
     // Initialize the appBar with context
     final appBar = UiConstants.appBar(context);
-
     return Scaffold(
       appBar: appBar,
       body: IndexedStack(
@@ -176,12 +176,4 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       ),
     );
   }
-}
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-
 }

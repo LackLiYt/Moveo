@@ -61,7 +61,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             //password
 
-            AuthField(controller: passwordController, hintText:'Password',),
+            AuthField(controller: passwordController, hintText:'Password', isPassword: true),
             const SizedBox(height:10),
 
             //forgot password

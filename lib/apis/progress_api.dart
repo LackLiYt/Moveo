@@ -16,6 +16,7 @@ abstract class IProgressAPI {
   FutureEitherVoid updateUserProgress(UserModel user);
   FutureEitherVoid updateLeaderboard(UserModel user);
   FutureEither<Map<String, dynamic>> getLeaderboard();
+  FutureEitherVoid updateLeaderboardSteps(String uid, int newSteps);
 }
 
 class ProgressAPI implements IProgressAPI {
@@ -50,11 +51,14 @@ class ProgressAPI implements IProgressAPI {
       print('[DEBUG] updateLeaderboard called with user: uid=${user.uid}, name=${user.name}, points=${user.points}, level=${user.level}');
       // Check if user exists in leaderboard
       try {
-        await _db.getDocument(
+        final existingDoc = await _db.getDocument(
           databaseId: AppwriteConstants.databaseId,
           collectionId: AppwriteConstants.leaderboardCollectionId,
           documentId: user.uid,
         );
+        
+        // Get current steps from leaderboard
+        final currentSteps = existingDoc.data['steps'] ?? 0;
         
         // Update existing leaderboard entry
         await _db.updateDocument(
@@ -65,6 +69,7 @@ class ProgressAPI implements IProgressAPI {
             'name': user.name,
             'points': user.points,
             'level': user.level,
+            'steps': currentSteps, // Keep the existing steps count
           },
         );
         print('[DEBUG] Updated leaderboard entry for uid=${user.uid}');
@@ -108,6 +113,42 @@ class ProgressAPI implements IProgressAPI {
       return right(response.toMap());
     } on AppwriteException catch (e, st) {
       return left(Failure(e.message ?? 'Error fetching leaderboard', st));
+    } catch (e, st) {
+      return left(Failure(e.toString(), st));
+    }
+  }
+
+  @override
+  FutureEitherVoid updateLeaderboardSteps(String uid, int newSteps) async {
+    try {
+      try {
+        final existingDoc = await _db.getDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.leaderboardCollectionId,
+          documentId: uid,
+        );
+        
+        // Get current steps from leaderboard
+        final currentSteps = existingDoc.data['steps'] ?? 0;
+        
+        // Only update if new steps are greater
+        if (newSteps > currentSteps) {
+          await _db.updateDocument(
+            databaseId: AppwriteConstants.databaseId,
+            collectionId: AppwriteConstants.leaderboardCollectionId,
+            documentId: uid,
+            data: {
+              'steps': newSteps,
+            },
+          );
+          print('[DEBUG] Updated steps in leaderboard for uid=$uid: $newSteps');
+        }
+      } catch (e) {
+        print('[DEBUG] Error updating steps in leaderboard: $e');
+      }
+      return right(null);
+    } on AppwriteException catch (e, st) {
+      return left(Failure(e.message ?? 'Error updating leaderboard steps', st));
     } catch (e, st) {
       return left(Failure(e.toString(), st));
     }

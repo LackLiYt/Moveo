@@ -29,9 +29,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Main</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>This app needs access to read your health data.</string>
+	<string>Moveo needs access to your health data to track your daily steps and activity for fitness tracking and social features.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>This app needs access to update your health data.</string>
+	<string>Moveo needs permission to update your health data to track your daily steps and activity for fitness tracking and social features.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open and in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -41,7 +41,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Main</string>
 	<key>NSMotionUsageDescription</key>
-	<string>This app needs access to motion and fitness data.</string>
+	<string>Moveo needs access to motion and fitness data to accurately track your steps and physical activity.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Main</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

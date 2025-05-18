@@ -63,7 +63,7 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: theme.cardTheme.color,
+          color: theme.brightness == Brightness.dark ? Pallete.backgroundColor : Pallete.whiteColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: Column(
@@ -73,7 +73,7 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
             TabBar(
               controller: _tabController,
               labelColor: Pallete.blueColor,
-              unselectedLabelColor: theme.textTheme.bodySmall?.color,
+              unselectedLabelColor: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
               indicatorColor: Pallete.blueColor,
               tabs: const [
                 Tab(text: 'World'),
@@ -193,18 +193,79 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
     const double rankWidth = 32;
     const int nameFlex = 1; // Use flex for the name to take available space, changed to int
     const double statWidth = 60; // Fixed width for stats (level, steps, hours, points)
+    final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Row(
         children: [
-          SizedBox(width: rankWidth, child: Text('#', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          SizedBox(
+            width: rankWidth,
+            child: Text(
+              '#',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
           const SizedBox(width: 8), // Space between rank and name
-          Expanded(flex: nameFlex, child: Text('name', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
-          SizedBox(width: statWidth, child: Text('level', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
-          SizedBox(width: statWidth, child: Text('steps', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
-          SizedBox(width: statWidth, child: Text('km', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
-          SizedBox(width: statWidth, child: Text('points', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          Expanded(
+            flex: nameFlex,
+            child: Text(
+              'name',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            width: statWidth,
+            child: Text(
+              'level',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            width: statWidth,
+            child: Text(
+              'steps',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            width: statWidth,
+            child: Text(
+              'km',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            width: statWidth,
+            child: Text(
+              'points',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ],
       ),
     );

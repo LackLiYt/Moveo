@@ -33,10 +33,11 @@ class HashtagText extends StatelessWidget {
         );
       } else {
         textSpans.add(
-          TextSpan
-          (text: '$element ',
-          style: const TextStyle(
-            fontSize: 16,
+          TextSpan(
+            text: '$element ',
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
             ),
           ),
         );

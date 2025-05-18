@@ -20,22 +20,25 @@ class LoginButton extends StatelessWidget {
     final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      child: Chip(
-        label: Text(
-          label,
-          style: GoogleFonts.montserrat(
-            color: textColor,
-            fontWeight: FontWeight.w600,
-          ),
-          overflow: TextOverflow.visible,
-        ),
-        backgroundColor: backgroundColor,
-        labelPadding: const EdgeInsets.symmetric(horizontal: 152, vertical: 7),
-        shape: RoundedRectangleBorder(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
+          border: Border.all(
             color: theme.textTheme.bodySmall?.color ?? Pallete.greyColor,
             width: 1,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: GoogleFonts.montserrat(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
           ),
         ),
       ),

@@ -28,8 +28,13 @@ class PostCard extends ConsumerWidget {
                     Container(
                       margin: const EdgeInsets.all(10),
                       child: CircleAvatar(
-                        backgroundImage: NetworkImage(user.profilePic),
+                        backgroundImage: user.profilePic.isNotEmpty 
+                          ? NetworkImage(user.profilePic)
+                          : null,
                         radius: 20,
+                        child: user.profilePic.isEmpty 
+                          ? const Icon(Icons.person)
+                          : null,
                       ),
                     ),
                     Expanded(
@@ -43,17 +48,19 @@ class PostCard extends ConsumerWidget {
                                 child: 
                                 Text(
                                   user.name,
-                                   style: const TextStyle(
+                                   style: TextStyle(
                                     fontSize: 18,
-                                     fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
                                   ),
+                                ),
                               ),
                               Text(
                                 '@${user.name} . ${timeago.format(
                                   post.createdAt,
                                   locale: 'en_short',
                                   )}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Pallete.greyColor,
                                   fontSize: 16,
@@ -69,7 +76,7 @@ class PostCard extends ConsumerWidget {
                 ),
                 if (post.text != null && post.text!.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: HashtagText(text: post.text!),
                   ),
                 
@@ -87,8 +94,19 @@ class PostCard extends ConsumerWidget {
                         errorBuilder: (context, error, stackTrace) => 
                           Container(
                             color: Colors.grey.shade300,
-                            child: const Center(child: Text('Image not available')),
+                            child: const Center(
+                              child: Icon(Icons.image_not_supported, size: 50),
+                            ),
                           ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey.shade200,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
                       ),
                       
                       // Front camera photo overlay
@@ -110,8 +128,19 @@ class PostCard extends ConsumerWidget {
                               errorBuilder: (context, error, stackTrace) => 
                                 Container(
                                   color: Colors.grey.shade200,
-                                  child: const Center(child: Text('Selfie not available')),
+                                  child: const Center(
+                                    child: Icon(Icons.image_not_supported, size: 30),
+                                  ),
                                 ),
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  color: Colors.grey.shade200,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
@@ -132,7 +161,11 @@ class PostCard extends ConsumerWidget {
                           size: 20,
                         ),
                       ),
-                      Text('${post.commentIds.length}'),
+                      Text('${post.commentIds.length}',
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                        ),
+                      ),
                       const SizedBox(width: 16),
                       IconButton(
                         onPressed: () {},
@@ -141,7 +174,11 @@ class PostCard extends ConsumerWidget {
                           size: 20,
                         ),
                       ),
-                      Text('${post.likes.length}'),
+                      Text('${post.likes.length}',
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                        ),
+                      ),
                     ],
                   ),
                 ),

@@ -36,7 +36,30 @@ class ProgressController extends StateNotifier<AsyncValue<UserModel?>> {
   }
 
   Future<void> updateProgressForSteps(UserModel user, int steps) async {
-    final updatedUser = _progressService.updateProgressForSteps(user, steps);
+    // Get the current steps from the leaderboard
+    final leaderboardResult = await _progressAPI.getLeaderboard();
+    int? previousSteps;
+    
+    leaderboardResult.fold(
+      (l) => null,
+      (r) {
+        final docs = (r['documents'] as List<dynamic>? ?? []);
+        for (var doc in docs) {
+          final data = doc['data'] ?? {};
+          if (data['uid'] == user.uid) {
+            previousSteps = data['steps'] ?? 0;
+            break;
+          }
+        }
+      },
+    );
+
+    final updatedUser = _progressService.updateProgressForSteps(user, steps, previousSteps: previousSteps);
+    
+    // Update the leaderboard steps
+    await _progressAPI.updateLeaderboardSteps(user.uid, steps);
+    
+    // Update other user progress
     await _syncProgressWithAppwrite(updatedUser);
   }
 

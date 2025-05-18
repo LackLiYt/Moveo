@@ -57,7 +57,7 @@
         <!-- Health plugin metadata -->
         <meta-data
             android:name="health_permissions"
-            android:value="activity,steps,distance,calories,weight,height,heart_rate,blood_oxygen,blood_glucose,blood_pressure,body_temperature" />
+            android:value="steps,activity,activity_summary,distance,calories,weight,height,heart_rate,blood_oxygen,blood_glucose,blood_pressure,body_temperature" />
 
         <!-- File provider for image picker -->
         <provider

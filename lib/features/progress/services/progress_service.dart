@@ -37,10 +37,18 @@ class ProgressService {
   }
   
   // Update user progress for steps
-  UserModel updateProgressForSteps(UserModel user, int steps) {
-    // Convert steps to points and experience
-    int pointsFromSteps = (steps / 100).floor(); // 1 point per 100 steps
-    int expFromSteps = (steps / 50).floor(); // 1 exp per 50 steps
+  UserModel updateProgressForSteps(UserModel user, int steps, {int? previousSteps}) {
+    // Only add new steps if they've increased
+    int newSteps = 0;
+    if (previousSteps != null && steps > previousSteps) {
+      newSteps = steps - previousSteps;
+    } else if (previousSteps == null) {
+      newSteps = steps;
+    }
+    
+    // Convert new steps to points and experience
+    int pointsFromSteps = (newSteps / 100).floor(); // 1 point per 100 steps
+    int expFromSteps = (newSteps / 50).floor(); // 1 exp per 50 steps
     
     return user
       .addPoints(pointsFromSteps)

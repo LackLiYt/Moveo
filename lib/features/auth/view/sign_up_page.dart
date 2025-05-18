@@ -67,7 +67,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> with  WidgetsBindingObs
     }
   }
 
-  int _page = 0;
+  final int _page = 0;
 
 
   Future<void> _loadInitialStepData() async {
@@ -129,7 +129,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> with  WidgetsBindingObs
 
 
             //password
-            AuthField(controller: passwordController, hintText:'Password',),
+            AuthField(controller: passwordController, hintText:'Password', isPassword: true),
             const SizedBox(height:10),
             
 
