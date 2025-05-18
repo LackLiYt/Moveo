@@ -4,7 +4,6 @@ import 'package:moveo/features/post/controller/post_controller.dart';
 import 'package:moveo/common/common.dart';
 import 'package:moveo/features/post/widgets/post_card.dart';
 import 'package:moveo/theme/pallete.dart';
-import 'package:moveo/models/post_model.dart';
 
 // Change to StatefulWidget to manage the list of posts received from the stream
 class PostList extends ConsumerWidget {

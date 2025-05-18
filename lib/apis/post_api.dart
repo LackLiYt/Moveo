@@ -90,6 +90,6 @@ class PostAPI implements IPostAPI {
 
   @override
   Stream<RealtimeMessage> getLatestPostsByUserId(String userId) {
-     return _realtime.subscribe(['databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.postCollectionId}.documents']).stream.where((event) => event.events.contains('databases.*.collections.*.documents.*.create') && (event.payload as Map<String, dynamic>)['uid'] == userId);
+     return _realtime.subscribe(['databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.postCollectionId}.documents']).stream.where((event) => event.events.contains('databases.*.collections.*.documents.*.create') && (event.payload)['uid'] == userId);
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/theme/theme.dart';
-import 'package:moveo/models/user_model.dart';
 import 'package:moveo/features/post/widgets/account_post_list.dart';
 
 Widget _buildStatItem(String count, String label) {

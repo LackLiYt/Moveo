@@ -7,7 +7,7 @@ import 'package:appwrite/models.dart' as model; // Import Appwrite models with a
 
 // Change to StatefulWidget to manage the list of posts received from the stream
 class AccountPostList extends ConsumerWidget {
-  const AccountPostList({Key? key}) : super(key: key);
+  const AccountPostList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

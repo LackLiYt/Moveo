@@ -134,7 +134,7 @@ class _LeaderboardPageViewState extends ConsumerState<LeaderboardPageView> with 
                 'name': name,
                 'level': data['level'] ?? 1,
                 'steps': data['steps'] ?? 0,
-                'km': 29, // Changed from 'hours' to 'km'
+                'km': ((data['km'] as num?)?.toDouble() ?? 0.0).toInt(), // Read km from data and convert to int
                 'points': points,
               };
             }).toList();

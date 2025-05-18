@@ -10,24 +10,28 @@ import 'package:moveo/features/global/views/global_page_view.dart';
 import 'package:moveo/features/health/health_data.dart';
 import 'package:health/health.dart';
 import 'dart:async';
+import 'package:moveo/features/home/views/home_content_view.dart';
+import 'package:moveo/features/post/widgets/home_post_list.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moveo/features/auth/controller/auth_controller.dart';
+import 'package:moveo/features/health/health_providers.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends ConsumerStatefulWidget {
   static route() => MaterialPageRoute(
-        builder: (context) => HomeView(),
+        builder: (context) => const HomeView(),
       );
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
+class _HomeViewState extends ConsumerState<HomeView> with WidgetsBindingObserver {
 
   @override
   initState(){
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadInitialStepData();
   }
 
   @override
@@ -39,7 +43,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   final health = Health();
 
   int _counter = 0;
-  int _getSteps = 0;
+  final int _getSteps = 0;
+  final int _weeklyExperience = 0; // Placeholder state variable
+  final String _weeklyTime = 'N/A'; // Placeholder state variable
+  final int _weeklyLevelsGained = 0; // Placeholder state variable
+  final int _overallLevel = 0; // Placeholder state variable
 
   void _startPeriodicStepUpdates() {
     _stopPeriodicStepUpdates();
@@ -61,7 +69,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       print("Додаток активовано (resumed)");
-      _loadInitialStepData();
       _startPeriodicStepUpdates();
     } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive || state == AppLifecycleState.hidden) {
       print("Додаток згорнуто (paused)");
@@ -70,19 +77,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   }
 
   int _page = 0;
-
-
-  Future<void> _loadInitialStepData() async {
-    // Викликаємо функцію з іншого файлу, передаючи наш екземпляр health
-    int? steps = await fetchStepData(health);
-
-    // Перевіряємо, чи віджет ще існує перед викликом setState
-    if (mounted) {
-      setState(() {
-        _getSteps = steps ?? 0; // Оновлюємо стан. Якщо steps = null, ставимо 0.
-      });
-    }
-  }
 
   void _incrementCounter() {
     setState(() {
@@ -123,11 +117,41 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
 
     // Initialize the appBar with context
     final appBar = UiConstants.appBar(context);
+
+    // Watch the currentUserDetailsProvider to get the overall level
+    final userDetailsAsyncValue = ref.watch(currentUserDetailsProvider);
+
+    // Watch the stepDataProvider to get the weekly steps
+    final stepDataAsyncValue = ref.watch(stepDataProvider);
+
+    // Define the pages for the bottom navigation bar
+    final List<Widget> bottomTabBarPages = [
+      // Use when to handle loading and error states of userDetailsAsyncValue and stepDataAsyncValue
+      userDetailsAsyncValue.when(
+        data: (user) => stepDataAsyncValue.when(
+          data: (steps) => HomeContentView(
+            weeklyExperience: _weeklyExperience, // Use state variable (placeholder for now)
+            weeklySteps: steps ?? 0, // Use steps from the provider
+            weeklyTime: _weeklyTime, // Use state variable (placeholder for now)
+            weeklyLevelsGained: _weeklyLevelsGained, // Use state variable (placeholder for now)
+            overallLevel: user?.level ?? 0, // Use overall level from user details
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(child: Text('Error loading step data: $error')),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()), // Show loading while user details load
+        error: (error, stackTrace) => Center(child: Text('Error loading user data: $error')),
+      ),
+      GlobalPageView(),
+      CreatePostView(), // Post creation view
+      AccountPage(), // Account page
+    ];
+
     return Scaffold(
       appBar: appBar,
       body: IndexedStack(
         index: _page,
-        children: UiConstants.bottomTabBarPages,
+        children: bottomTabBarPages,
       ),
       bottomNavigationBar: CupertinoTabBar(
         backgroundColor: backgroundColor,

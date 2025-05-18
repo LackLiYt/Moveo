@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
-import 'package:moveo/features/post/widgets/home_post_list.dart';
 import 'package:moveo/features/chat/views/chat_page_view.dart';
 
 class UiConstants {
@@ -33,11 +32,4 @@ class UiConstants {
       ],
     );
   }
-
-  static const List<Widget> bottomTabBarPages = [
-    PostList(),
-    Text('Public Screen'),
-    Text('Post Screen'),
-    Text('Account Screen'),
-  ];
 }

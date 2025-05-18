@@ -128,23 +128,28 @@ class ProgressAPI implements IProgressAPI {
           documentId: uid,
         );
         
-        // Get current steps from leaderboard
+        // Get current steps and km from leaderboard
         final currentSteps = existingDoc.data['steps'] ?? 0;
+        final currentKm = (existingDoc.data['km'] as num?)?.toDouble() ?? 0.0; // Assuming km is stored as a number
         
         // Only update if new steps are greater
         if (newSteps > currentSteps) {
+          // Calculate new kilometers (assuming 1 km = 1000 steps)
+          final newKm = (newSteps / 1000).toDouble();
+
           await _db.updateDocument(
             databaseId: AppwriteConstants.databaseId,
             collectionId: AppwriteConstants.leaderboardCollectionId,
             documentId: uid,
             data: {
               'steps': newSteps,
+              'km': newKm, // Add kilometers to the update data
             },
           );
-          print('[DEBUG] Updated steps in leaderboard for uid=$uid: $newSteps');
+          print('[DEBUG] Updated steps and km in leaderboard for uid=$uid: Steps=$newSteps, Km=$newKm');
         }
       } catch (e) {
-        print('[DEBUG] Error updating steps in leaderboard: $e');
+        print('[DEBUG] Error updating steps and km in leaderboard: $e');
       }
       return right(null);
     } on AppwriteException catch (e, st) {
