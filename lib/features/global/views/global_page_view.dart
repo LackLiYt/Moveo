@@ -1,51 +1,43 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
+class GlobalPageView extends StatelessWidget {
+  static route() => MaterialPageRoute(
+        builder: (context) => const GlobalPageView(),
+      );
 
-class MyApp extends StatelessWidget {
+  const GlobalPageView({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Global page',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Global'),
-        ),
-        body: Center(
-          child: FourImageButtonsGrid(),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Global'),
       ),
+      body: const FourImageButtonsGrid(),
     );
   }
 }
+
 class FourImageButtonsGrid extends StatelessWidget {
+  const FourImageButtonsGrid({super.key});
+
   Widget _buildImageButton({
     required String imagePath,
     required VoidCallback onPressed,
-    double width = 120,
-    double height = 120,
-    double padding = 8.0,
   }) {
-    return Padding(
-      padding: EdgeInsets.all(padding),
-      child: InkWell(
-        onTap: onPressed,
-        splashColor: Colors.blue.withAlpha(100),
-        borderRadius: BorderRadius.circular(12), // Опціонально, для круглих бризок
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12.0),
-            child: Image.asset(
-              imagePath,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-            ),
+    return InkWell(
+      onTap: onPressed,
+      splashColor: Colors.blue.withAlpha(100),
+      borderRadius: BorderRadius.circular(12),
+      child: Ink(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12.0),
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -54,54 +46,33 @@ class FourImageButtonsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center, // Центрування стовпця по вертикалі
-      crossAxisAlignment: CrossAxisAlignment.center, // Центрування рядків по горизонталі
-      mainAxisSize: MainAxisSize.min, // Щоб Column займав мінімально необхідну висоту
-      children: <Widget>[
-        // Перший ряд з двома кнопками
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center, // Центрування кнопок у рядку
-          mainAxisSize: MainAxisSize.min, // Щоб Row займав мінімально необхідну ширину
-          children: <Widget>[
-            _buildImageButton(
-              imagePath: 'assets/global_photos/events.png', // Замініть на ваш шлях
-              onPressed: () {
-                print('Clicked events');
-                // Ваша дія для кнопки 1
-              },
-            ),
-            _buildImageButton(
-              imagePath: 'assets/global_photos/events.png', // Замініть на ваш шлях
-              onPressed: () {
-                print('Натиснуто кнопку 2');
-                // Ваша дія для кнопки 2
-              },
-            ),
-          ],
-        ),
-        // Другий ряд з двома кнопками
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center, // Центрування кнопок у рядку
-          mainAxisSize: MainAxisSize.min, // Щоб Row займав мінімально необхідну ширину
-          children: <Widget>[
-            _buildImageButton(
-              imagePath: 'assets/global_photos/events.png', // Замініть на ваш шлях
-              onPressed: () {
-                print('Натиснуто кнопку 3');
-                // Ваша дія для кнопки 3
-              },
-            ),
-            _buildImageButton(
-              imagePath: 'assets/global_photos/events.png', // Замініть на ваш шлях
-              onPressed: () {
-                print('Натиснуто кнопку 4');
-                // Ваша дія для кнопки 4
-              },
-            ),
-          ],
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        shrinkWrap: true,
+        childAspectRatio: 1, // Square buttons
+        children: [
+          _buildImageButton(
+            imagePath: 'assets/global_photos/events.jpg',
+            onPressed: () => print('Clicked events'),
+          ),
+          _buildImageButton(
+            imagePath: 'assets/global_photos/events.jpg',
+            onPressed: () => print('Clicked button 2'),
+          ),
+          _buildImageButton(
+            imagePath: 'assets/global_photos/events.jpg',
+            onPressed: () => print('Clicked button 3'),
+          ),
+          _buildImageButton(
+            imagePath: 'assets/global_photos/events.jpg',
+            onPressed: () => print('Clicked button 4'),
+          ),
+        ],
+      ),
     );
   }
 }

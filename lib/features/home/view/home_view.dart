@@ -6,6 +6,7 @@ import 'package:moveo/constants/ui_constants.dart';
 import 'package:moveo/features/leaderboard/leaderboard_page_view.dart';
 import 'package:moveo/features/post/views/create_post_view.dart';
 import 'package:moveo/features/account/accout_page.dart';
+import 'package:moveo/features/global/views/global_page_view.dart';
 import 'package:moveo/features/health/health_data.dart';
 import 'package:health/health.dart';
 import 'dart:async';
@@ -107,6 +108,10 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     Navigator.push(context, LeaderboardPageView.route());
   }
 
+  void onGlobal() {
+    Navigator.push(context, GlobalPageView.route());
+  }
+
   @override
   Widget build(BuildContext context) {
     // Use Theme to dynamically retrieve colors
@@ -136,7 +141,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             onAccount();
           } else if (index == 1) {
             // Leaderboard icon index
-            onLeaderboard();
+            //onLeaderboard();
+            onGlobal();
           } else {
             onPageChange(index);
           }
@@ -176,4 +182,5 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       ),
     );
   }
+  
 }

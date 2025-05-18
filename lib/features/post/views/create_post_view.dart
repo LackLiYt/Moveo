@@ -242,7 +242,7 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
               ),
 
               // Preview area (with a defined height)
-              Container(
+              SizedBox(
                 height: MediaQuery.of(context).size.height * 0.7,
                 child: Stack(
                   alignment: Alignment.bottomCenter,
