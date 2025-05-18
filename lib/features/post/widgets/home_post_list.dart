@@ -4,13 +4,26 @@ import 'package:moveo/features/post/controller/post_controller.dart';
 import 'package:moveo/common/common.dart';
 import 'package:moveo/features/post/widgets/post_card.dart';
 import 'package:moveo/theme/pallete.dart';
+import 'package:moveo/models/post_model.dart';
 
+// Change to StatefulWidget to manage the list of posts received from the stream
 class PostList extends ConsumerWidget {
   const PostList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(getPostsProvider).when(
+    // Listen to the real-time stream for updates and refresh the posts provider
+    ref.listen(getLatestPostsProvider, (previous, next) {
+      next.whenData((_) {
+        debugPrint('Real-time update received, refreshing posts!');
+        ref.invalidate(getPostsProvider); // Invalidate to refetch latest data
+      });
+    });
+
+    // Watch the FutureProvider for the list of posts
+    final postsAsyncValue = ref.watch(getPostsProvider);
+
+    return postsAsyncValue.when(
       data: (posts) {
         if (posts.isEmpty) {
           return Center(
@@ -24,10 +37,11 @@ class PostList extends ConsumerWidget {
           );
         }
         
-        debugPrint('Fetched ${posts.length} posts');
+        debugPrint('Displaying ${posts.length} posts');
+        // RefreshIndicator can still be useful for manual pull-to-refresh
         return RefreshIndicator(
           onRefresh: () async {
-            ref.refresh(getPostsProvider);
+            ref.invalidate(getPostsProvider); // Allow manual refresh as well
           },
           child: ListView.builder(
             itemCount: posts.length,

@@ -137,6 +137,15 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+      
+      // Automatically switch camera if the other photo is not taken yet
+      if ((_isRearCamera && _frontPhoto == null) || (!_isRearCamera && _rearPhoto == null)) {
+        _switchCamera();
+      } else {
+        // Optionally, provide feedback if both photos are taken and no switch is needed.
+        // For example, show a confirmation or prepare for posting.
+      }
+
     } catch (e) {
       if (mounted) {
         showSnackBar(context, 'Error taking picture: $e');
@@ -344,33 +353,13 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                   ),
                 ),
 
-              if (isCapturingComplete)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    controller: _textController,
-                    decoration: InputDecoration(
-                      hintText: 'Add a caption (optional)',
-                      border: const OutlineInputBorder(),
-                      fillColor: Theme.of(context).brightness == Brightness.dark ? Pallete.backgroundColor : Pallete.whiteColor,
-                      filled: true,
-                      hintStyle: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark ? Pallete.greyColor : Pallete.darkGreyColor,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    style: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
-                    ),
-                    maxLines: 3,
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    autofocus: false,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
-                ),
+              // Camera controls row (modified to be below text input)
+              // We will move camera controls here or adjust their position based on final layout desire.
+              // For now, keep the original controls placement or consider integrating into new layout.
+
+              // Original Camera Controls (Consider if still needed in this exact form or should be integrated)
+              // The existing floating action button for camera switch will need to be relocated or changed.
+
             ],
           ),
     );
@@ -393,6 +382,9 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
   }
   
   Widget _buildPostPreview() {
+    final bool isCapturingComplete = _rearPhoto != null && _frontPhoto != null;
+    final bool isPostingLoading = ref.watch(postControllerProvider);
+    
     return Column(
       children: [
         Expanded(
@@ -423,31 +415,49 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                   ),
                 ),
               ),
-
-              Positioned(
-                bottom: 20,
-                right: 20,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _rearPhoto = null;
-                      _frontPhoto = null;
-                      _textController.clear();
-                    });
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Pallete.semiTransparent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      color: Pallete.whiteColor,
-                      size: 30,
-                    ),
+            ],
+          ),
+        ),
+        
+        // Caption input and Post button
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: _textController,
+                decoration: InputDecoration(
+                  hintText: 'Add a caption...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
                   ),
+                  filled: true,
+                  fillColor: Theme.of(context).brightness == Brightness.dark ? Pallete.darkGreyColor : Pallete.greyColor.withOpacity(0.2),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0),
                 ),
+                maxLines: 3,
+                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor)),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: isCapturingComplete && !isPostingLoading ? _sharePost : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Pallete.blueColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: isPostingLoading
+                    ? const CircularProgressIndicator(color: Pallete.whiteColor)
+                    : const Text(
+                        'Post',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Pallete.whiteColor,
+                        ),
+                      ),
               ),
             ],
           ),

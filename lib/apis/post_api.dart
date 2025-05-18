@@ -9,7 +9,7 @@ import 'package:moveo/core/providers.dart';
 import 'package:moveo/models/post_model.dart';
 
 final postAPIProvider = Provider((ref) {
-  return PostAPI(db: ref.watch(appwriteDatabaseProvider)
+  return PostAPI(db: ref.watch(appwriteDatabaseProvider), realtime: ref.watch(appwriteRealtimeProvider)
   );
 });
 
@@ -17,11 +17,15 @@ abstract class IPostAPI {
   FutureEither<Document> sharePost(Post post);
   FutureEither<Document> sharePostData(Map<String, dynamic> data);
   Future<List<Document>> getPosts();
+  Future<List<Document>> getPostsByUserId(String userId);
+  Stream<RealtimeMessage> getLatestPosts();
+  Stream<RealtimeMessage> getLatestPostsByUserId(String userId);
 }
 
 class PostAPI implements IPostAPI {
   final Databases _db;
-  PostAPI({required Databases db}) : _db = db;
+  final Realtime _realtime;
+  PostAPI({required Databases db, required Realtime realtime}) : _db = db, _realtime = realtime;
   @override
   FutureEither<Document> sharePost(Post post) async {
     try {
@@ -65,5 +69,27 @@ class PostAPI implements IPostAPI {
         collectionId: AppwriteConstants.postCollectionId,
       );
       return documents.documents;
+  }
+
+  @override
+  Future<List<Document>> getPostsByUserId(String userId) async {
+    final documents = await _db.listDocuments(
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.postCollectionId,
+      queries: [
+        Query.equal('uid', userId),
+      ],
+    );
+    return documents.documents;
+  }
+  
+  @override
+  Stream<RealtimeMessage> getLatestPosts() {
+    return _realtime.subscribe(['databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.postCollectionId}.documents']).stream;
+  }
+
+  @override
+  Stream<RealtimeMessage> getLatestPostsByUserId(String userId) {
+     return _realtime.subscribe(['databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.postCollectionId}.documents']).stream.where((event) => event.events.contains('databases.*.collections.*.documents.*.create') && (event.payload as Map<String, dynamic>)['uid'] == userId);
   }
 }

@@ -16,4 +16,7 @@ class AssetsConstants {
   static const String UpIcon = '$_svgsPath/up.svg';
   static const String AccountFilledIcon = '$_svgsPath/account_filled.svg';
   static const String AccountOutlinedIcon = '$_svgsPath/account_outlined.svg';
+
+
+  
 }

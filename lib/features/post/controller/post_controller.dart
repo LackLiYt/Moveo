@@ -22,6 +22,25 @@ final getPostsProvider = FutureProvider((ref) {
   return postController.getPosts();
 });
 
+final getPostsByUserIdProvider = FutureProvider.family((ref, String userId) {
+  final postController = ref.watch(postControllerProvider.notifier);
+  return postController._postAPI.getPostsByUserId(userId).then(
+    (posts) => posts.map((post) => Post.fromMap(post.data)).toList(),
+  );
+});
+
+final getLatestPostsProvider = StreamProvider((ref) {
+  final postAPI = ref.watch(postAPIProvider);
+  return postAPI.getLatestPosts().where((event) => event.events.any((e) => e.startsWith('databases.*.collections.*.documents.*.'))
+  ).map((event) => true);
+});
+
+final getLatestPostsByUserIdProvider = StreamProvider.family((ref, String userId) {
+   final postAPI = ref.watch(postAPIProvider);
+  return postAPI.getLatestPostsByUserId(userId).where((event) => event.events.any((e) => e.startsWith('databases.*.collections.*.documents.*.'))
+  ).map((event) => true);
+});
+
 class PostController extends StateNotifier<bool> {
   final PostAPI _postAPI;
   final Ref _ref;
