@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/features/post/controller/post_controller.dart';
-import 'package:moveo/models/post_model.dart';
-import 'package:appwrite/models.dart' as model; // Import Appwrite models with alias
+// Import Appwrite models with alias
 
 // Change to StatefulWidget to manage the list of posts received from the stream
 class AccountPostList extends ConsumerWidget {

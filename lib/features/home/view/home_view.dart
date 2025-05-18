@@ -7,11 +7,9 @@ import 'package:moveo/features/leaderboard/leaderboard_page_view.dart';
 import 'package:moveo/features/post/views/create_post_view.dart';
 import 'package:moveo/features/account/accout_page.dart';
 import 'package:moveo/features/global/views/global_page_view.dart';
-import 'package:moveo/features/health/health_data.dart';
 import 'package:health/health.dart';
 import 'dart:async';
 import 'package:moveo/features/home/views/home_content_view.dart';
-import 'package:moveo/features/post/widgets/home_post_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/features/health/health_providers.dart';
@@ -51,9 +49,12 @@ class _HomeViewState extends ConsumerState<HomeView> with WidgetsBindingObserver
 
   void _startPeriodicStepUpdates() {
     _stopPeriodicStepUpdates();
-    print("Запускаємо таймер для оновлення кроків кожні 30 секунд");
-    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 70), (timer) {
-      print("Дані про кроки оновлено");
+    print("Starting step update timer for every 30 seconds");
+    _stepUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      print("Updating step data...");
+      // Invalidate the stepDataProvider to trigger a refetch
+      ref.invalidate(stepDataProvider);
+      // The stepDataProvider updates user progress and leaderboard upon fetching new steps
     });
   }
 

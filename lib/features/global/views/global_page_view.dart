@@ -30,8 +30,6 @@ class Page_Items extends StatelessWidget {
     required String imagePath,
     required VoidCallback onPressed,
     required String text,
-    double myButtonWidth = 120.0,
-    double myButtonHeight = 90.0,
   }) {
       return Container(
   width: 60,

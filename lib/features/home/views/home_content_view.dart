@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/features/leaderboard/widgets/weekly_stats.dart'; // Assuming this is the correct path
 import 'package:moveo/features/post/widgets/home_post_list.dart'; // Assuming this is the correct path
-import 'package:moveo/features/post/widgets/account_post_list.dart';
 
 class HomeContentView extends ConsumerWidget {
   // You will need to pass the stats data to WeeklyUpgradePanel
