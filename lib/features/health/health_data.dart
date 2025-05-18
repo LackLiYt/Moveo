@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:health/health.dart';
 
 Future<int?> fetchStepData(Health health) async {

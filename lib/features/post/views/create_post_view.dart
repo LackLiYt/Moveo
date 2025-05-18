@@ -206,30 +206,144 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
     final bool isPostingLoading = ref.watch(postControllerProvider);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isRearCamera 
-          ? (_rearPhoto == null ? 'Take Rear Photo' : 'Rear Photo Taken') 
-          : (_frontPhoto == null ? 'Take Front Photo' : 'Front Photo Taken')),
-        actions: [
-          if (isCapturingComplete)
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed: !isPostingLoading ? _sharePost : null,
-            ),
-        ],
-      ),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark ? Pallete.backgroundColor : Pallete.whiteColor,
       body: _isLoading || _cameraController == null || !_cameraController!.value.isInitialized
         ? const Center(child: CircularProgressIndicator())
         : Column(
             children: [
-              // Preview area
-              Expanded(
-                child: _rearPhoto != null && _frontPhoto != null
-                  ? _buildPostPreview()
-                  : _buildCameraPreview(),
+              // Custom Header (matching the photo)
+              Padding(
+                padding: const EdgeInsets.only(top: 40.0, left: 16.0, right: 16.0, bottom: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'New post',
+                          style: TextStyle(
+                            color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Preview area (with a defined height)
+              Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    SizedBox.expand(
+                      child: _rearPhoto != null && _frontPhoto != null
+                        ? _buildPostPreview()
+                        : _buildCameraPreview(),
+                    ),
+                    
+                    // Camera Controls and indicators (only in camera mode, positioned at the bottom within the stack)
+                    if (!isCapturingComplete)
+                      Positioned(
+                        bottom: 20.0,
+                        left: 0,
+                        right: 0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // Flash Icon
+                                Icon(
+                                  Icons.flash_on,
+                                  color: Pallete.whiteColor,
+                                  size: 30,
+                                ),
+                                // Flip Camera Icon
+                                GestureDetector(
+                                  onTap: _switchCamera,
+                                  child: Icon(
+                                    Icons.flip_camera_ios,
+                                    color: Pallete.whiteColor,
+                                    size: 30,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // Front/Rear indicators
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'front',
+                                  style: TextStyle(
+                                    color: !_isRearCamera ? Pallete.whiteColor : Pallete.greyColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  'rear',
+                                  style: TextStyle(
+                                    color: _isRearCamera ? Pallete.whiteColor : Pallete.greyColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
               
-              // Text input (only when both photos are taken)
+              // Capture Button Area (placed below the preview)
+              if (!isCapturingComplete)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: _takePicture,
+                      child: Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
               if (isCapturingComplete)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -253,71 +367,11 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                     textCapitalization: TextCapitalization.sentences,
                     autofocus: false,
                     onChanged: (value) {
-                      // Force a rebuild to ensure text is captured
                       setState(() {});
                     },
                   ),
                 ),
-              
-              // Photo info
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Chip(
-                      label: Text('Rear: ${_rearPhoto != null ? "✓" : "×"}'),
-                      backgroundColor: _rearPhoto != null ? Colors.green.shade100 : Colors.red.shade100,
-                    ),
-                    const SizedBox(width: 8),
-                    Chip(
-                      label: Text('Front: ${_frontPhoto != null ? "✓" : "×"}'),
-                      backgroundColor: _frontPhoto != null ? Colors.green.shade100 : Colors.red.shade100,
-                    ),
-                  ],
-                ),
-              ),
             ],
-          ),
-      bottomNavigationBar: _isLoading || isPostingLoading
-        ? const LinearProgressIndicator()
-        : Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                if (!isCapturingComplete)
-                  FloatingActionButton(
-                    heroTag: 'take_photo',
-                    onPressed: _takePicture,
-                    child: const Icon(Icons.camera),
-                  ),
-                if (!isCapturingComplete)
-                  FloatingActionButton(
-                    heroTag: 'switch_camera',
-                    onPressed: _switchCamera,
-                    child: Icon(_isRearCamera ? Icons.camera_front : Icons.camera_rear),
-                  ),
-                if (isCapturingComplete)
-                  FloatingActionButton(
-                    heroTag: 'retake_photos',
-                    onPressed: () {
-                      setState(() {
-                        _rearPhoto = null;
-                        _frontPhoto = null;
-                      });
-                      _initializeCamera();
-                    },
-                    child: const Icon(Icons.refresh),
-                  ),
-                if (isCapturingComplete)
-                  FloatingActionButton(
-                    heroTag: 'share_post',
-                    onPressed: _sharePost,
-                    child: const Icon(Icons.send),
-                  ),
-              ],
-            ),
           ),
     );
   }
@@ -345,13 +399,11 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Main (rear) photo
               Image.file(
                 _rearPhoto!,
                 fit: BoxFit.cover,
               ),
               
-              // Selfie overlay
               Positioned(
                 right: 16,
                 bottom: 16,
@@ -367,6 +419,32 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                     child: Image.file(
                       _frontPhoto!,
                       fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                bottom: 20,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _rearPhoto = null;
+                      _frontPhoto = null;
+                      _textController.clear();
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Pallete.semiTransparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: Pallete.whiteColor,
+                      size: 30,
                     ),
                   ),
                 ),
