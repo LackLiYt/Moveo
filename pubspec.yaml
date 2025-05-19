@@ -27,6 +27,7 @@ dependencies:
   health: ^12.1.0
   flutter_3d_controller: ^2.2.0
   flutter_chat_ui: ^1.6.15
+
   # Performance optimization packages
   cached_network_image: ^3.3.1
   flutter_cache_manager: ^3.3.1
@@ -37,6 +38,7 @@ dependencies:
   device_info_plus: ^10.1.2
   package_info_plus: ^8.3.0
   flutter_web_auth_2: ^4.1.0
+  permission_handler: ^11.1.0
 
 dependency_overrides:
   flutter_web_auth_2: ^4.1.0
