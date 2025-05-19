@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:moveo/theme/pallete.dart';
+import 'package:moveo/features/chat/views/chat_page_view.dart';
 
 class HomePage extends StatefulWidget {
   static route() => MaterialPageRoute(builder: (context) => const HomePage());
@@ -31,13 +32,30 @@ class _HomePageState extends State<HomePage> {
           color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
         ),
         actions: [
-          Icon(
-            Icons.comment,
-            color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: IconButton(
+              icon: SizedBox(
+                width: 24.0,
+                height: 24.0,
+                child: Icon(
+                  Icons.chat_bubble_outline,
+                  color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => const ChatPageView(),
+                ));
+              },
+            ),
           ),
-          Icon(
-            Icons.notifications,
-            color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Icon(
+              Icons.notifications,
+              color: theme.brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+            ),
           ),
         ],
       ),

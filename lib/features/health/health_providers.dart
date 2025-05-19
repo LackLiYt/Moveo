@@ -10,12 +10,32 @@ final stepDataProvider = FutureProvider<int?>((ref) async {
   final health = ref.watch(healthProvider);
   final steps = await fetchStepData(health);
   
-  // Get the current user details
-  final userDetails = await ref.watch(currentUserDetailsProvider.future);
-  if (userDetails != null && steps != null) {
+  if (steps != null) {
     // Update progress with the new steps
-    await ref.read(progressControllerProvider.notifier).updateProgressForSteps(userDetails, steps);
+    await ref.read(progressControllerProvider.notifier).updateProgressForSteps(steps);
   }
   
   return steps;
+});
+
+final dailyStepsProvider = FutureProvider<int?>((ref) async {
+  final health = ref.watch(healthProvider);
+  final steps = await fetchDailyStepData(health);
+  
+  if (steps != null) {
+    // Update progress with the new steps
+    await ref.read(progressControllerProvider.notifier).updateProgressForSteps(steps);
+  }
+  
+  return steps;
+});
+
+final weeklyStepsProvider = FutureProvider<int?>((ref) async {
+  final health = ref.watch(healthProvider);
+  return await fetchWeeklyStepData(health);
+});
+
+final monthlyStepsProvider = FutureProvider<int?>((ref) async {
+  final health = ref.watch(healthProvider);
+  return await fetchMonthlyStepData(health);
 }); 

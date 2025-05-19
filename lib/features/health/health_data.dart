@@ -2,86 +2,79 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:health/health.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+Future<bool> requestHealthPermissions() async {
+  final types = [
+    HealthDataType.STEPS,
+    HealthDataType.WEIGHT,
+    HealthDataType.HEIGHT,
+    HealthDataType.BLOOD_OXYGEN,
+    HealthDataType.BLOOD_PRESSURE_SYSTOLIC,
+    HealthDataType.BLOOD_PRESSURE_DIASTOLIC,
+    HealthDataType.BODY_TEMPERATURE,
+    HealthDataType.BODY_FAT_PERCENTAGE,
+    HealthDataType.HEART_RATE,
+    HealthDataType.RESTING_HEART_RATE,
+    HealthDataType.WAIST_CIRCUMFERENCE,
+  ];
+
+  final permissions = await Permission.activityRecognition.request();
+  if (permissions.isGranted) {
+    return true;
+  }
+  return false;
+}
 
 Future<int?> fetchStepData(Health health) async {
-  int? steps;
-
-  var types = [
-    HealthDataType.STEPS,
-  ];
   final now = DateTime.now();
   final midnight = DateTime(now.year, now.month, now.day);
-
-  var permissions = [
-    HealthDataAccess.READ,
-    HealthDataAccess.WRITE,
-  ];
-
+  
   try {
-    // Request authorization
-    bool requested = await health.requestAuthorization(types, permissions: permissions);
-
-    if (requested) {
-      try {
-        if (Platform.isAndroid) {
-          // Android implementation
-          try {
-            // First try to get total steps for today
-            steps = await health.getTotalStepsInInterval(midnight, now);
-          } catch (e) {
-            print("Error getting total steps on Android: $e");
-          }
-
-          // If steps is null, try getting the latest step count
-          if (steps == null) {
-            try {
-              final latestSteps = await health.getHealthDataFromTypes(
-                types: types,
-                startTime: midnight,
-                endTime: now,
-              );
-              if (latestSteps.isNotEmpty) {
-                steps = latestSteps.first.value as int?;
-              }
-            } catch (e) {
-              print("Error getting latest steps on Android: $e");
-            }
-          }
-        } else if (Platform.isIOS) {
-          // iOS implementation
-          try {
-            // iOS has better support for getting total steps
-            steps = await health.getTotalStepsInInterval(midnight, now);
-          } catch (e) {
-            print("Error getting steps on iOS: $e");
-            
-            // Fallback for iOS if the primary method fails
-            try {
-              final latestSteps = await health.getHealthDataFromTypes(
-                types: types,
-                startTime: midnight,
-                endTime: now,
-              );
-              if (latestSteps.isNotEmpty) {
-                steps = latestSteps.first.value as int?;
-              }
-            } catch (e) {
-              print("Error getting latest steps on iOS: $e");
-            }
-          }
-        }
-        
-        print("Successfully fetched steps: $steps");
-        return steps;
-      } catch (error) {
-        print("Error fetching steps: $error");
-      }
-    } else {
-      print("Authorization not granted");
-    }
+    final steps = await health.getTotalStepsInInterval(midnight, now);
+    return steps;
   } catch (e) {
-    print("Error requesting authorization: $e");
+    print('Error fetching step data: $e');
+    return null;
   }
+}
 
-  return null;
+Future<int?> fetchDailyStepData(Health health) async {
+  final now = DateTime.now();
+  final startOfDay = DateTime(now.year, now.month, now.day);
+  
+  try {
+    final steps = await health.getTotalStepsInInterval(startOfDay, now);
+    return steps;
+  } catch (e) {
+    print('Error fetching daily step data: $e');
+    return null;
+  }
+}
+
+Future<int?> fetchWeeklyStepData(Health health) async {
+  final now = DateTime.now();
+  final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+  final startOfDay = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+  
+  try {
+    final steps = await health.getTotalStepsInInterval(startOfDay, now);
+    return steps;
+  } catch (e) {
+    print('Error fetching weekly step data: $e');
+    return null;
+  }
+}
+
+Future<int?> fetchMonthlyStepData(Health health) async {
+  final now = DateTime.now();
+  final startOfMonth = DateTime(now.year, now.month, 1);
+  
+  try {
+    final steps = await health.getTotalStepsInInterval(startOfMonth, now);
+    return steps;
+  } catch (e) {
+    print('Error fetching monthly step data: $e');
+    return null;
+  }
 }

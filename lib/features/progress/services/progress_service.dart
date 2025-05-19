@@ -55,17 +55,17 @@ class ProgressService {
       .addExperience(expFromSteps);
   }
 
-  // Update user progress for new follower
-  UserModel updateProgressForNewFollower(UserModel user) {
-    return user
-      .addPoints(POINTS_PER_FOLLOWER)
-      .addExperience(EXP_PER_FOLLOWER);
-  }
-
   // Update user progress for comment
   UserModel updateProgressForComment(UserModel user) {
     return user
       .addPoints(POINTS_PER_COMMENT)
       .addExperience(EXP_PER_COMMENT);
+  }
+
+  // Update user progress for follower
+  UserModel updateProgressForFollower(UserModel user) {
+    return user
+      .addPoints(POINTS_PER_FOLLOWER)
+      .addExperience(EXP_PER_FOLLOWER);
   }
 } 

@@ -37,6 +37,7 @@ dependencies:
   device_info_plus: ^10.1.2
   package_info_plus: ^8.3.0
   flutter_web_auth_2: ^4.1.0
+  permission_handler: ^11.1.0
 
 dependency_overrides:
   flutter_web_auth_2: ^4.1.0

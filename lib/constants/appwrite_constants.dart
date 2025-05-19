@@ -8,6 +8,9 @@ class AppwriteConstants {
   static const String postTestCollectionId = '67faa053003587684a33';
   static const String leaderboardCollectionId = '681b5a350024b878fecd';
 
+  // Chat Collections
+  static const String chatsCollectionId = 'chats';
+  static const String messagesCollectionId = 'messages';
 
   static const String imagesBucketId = '6796730c003d58e79e62';
   static String imageUrl(String imageId) => '$endPoint/storage/buckets/$imagesBucketId/files/$imageId/view?project=$projectId';
