@@ -1,4 +1,3 @@
-
 import 'package:appwrite/appwrite.dart';
 import 'package:moveo/constants/appwrite_constants.dart';
 import 'package:moveo/models/chat_model.dart';
@@ -48,17 +47,12 @@ class ChatController {
     try {
       await databases.createDocument(
         databaseId: AppwriteConstants.databaseId,
-        collectionId: AppwriteConstants.usersCollectionId,
+        collectionId: AppwriteConstants.commentsCollectionId,
         documentId: ID.unique(),
         data: {
-          "message": message,
-          "senderId": senderId,
-          "receiverId": receiverId,
-          "timestamp": DateTime.now().toIso8601String(),
-          "isSeenbyReceiver": false,
-          "isImage": isImage,
-          "userData": [senderId, receiverId],
-          "isGroupInvite": isGroupInvite,
+          "uid": senderId,
+          "text": message,
+          "createdAt": DateTime.now().toIso8601String(),
         },
       );
       return true;

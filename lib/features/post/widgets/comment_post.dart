@@ -17,7 +17,7 @@ class _CommentsScreenState extends ConsumerState<CommentsScreen> {
     final text = _commentController.text.trim();
     if (text.isNotEmpty) {
       // TODO: Додати логіку збереження коментаря до Firebase або ін.
-      print('Коментар: $text для поста ${widget.post.postId}');
+      print('Коментар: $text для поста ${widget.post.id}');
       _commentController.clear();
     }
   }
