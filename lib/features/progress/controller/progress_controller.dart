@@ -4,73 +4,96 @@ import 'package:moveo/features/progress/models/daily_challenge.dart';
 import 'package:moveo/features/progress/models/level_benefits.dart';
 import 'package:moveo/features/progress/services/progress_service.dart';
 import 'package:moveo/apis/progress_api.dart';
+import 'package:moveo/features/auth/controller/auth_controller.dart';
 
 final progressControllerProvider = StateNotifierProvider<ProgressController, AsyncValue<UserModel?>>((ref) {
   return ProgressController(
     progressAPI: ref.watch(progressAPIProvider),
+    ref: ref,
   );
 });
 
 class ProgressController extends StateNotifier<AsyncValue<UserModel?>> {
   final ProgressService _progressService = ProgressService();
   final IProgressAPI _progressAPI;
+  final Ref _ref;
 
-  ProgressController({required IProgressAPI progressAPI}) 
-      : _progressAPI = progressAPI,
-        super(const AsyncValue.data(null));
+  ProgressController({
+    required IProgressAPI progressAPI,
+    required Ref ref,
+  })  : _progressAPI = progressAPI,
+        _ref = ref,
+        super(const AsyncValue.loading());
+
+  Future<void> _syncProgressWithAppwrite(UserModel user) async {
+    try {
+      await _progressAPI.updateUserProgress(user);
+      state = AsyncValue.data(user);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 
   // Update progress for different activities
-  Future<void> updateProgressForPost(UserModel user) async {
-    final updatedUser = _progressService.updateProgressForPost(user);
+  Future<void> updateProgressForPost() async {
+    final currentUser = await _ref.read(currentUserDetailsProvider.future);
+    if (currentUser == null) return;
+
+    final updatedUser = _progressService.updateProgressForPost(currentUser);
     await _syncProgressWithAppwrite(updatedUser);
   }
 
-  Future<void> updateProgressForLike(UserModel user) async {
-    final updatedUser = _progressService.updateProgressForLike(user);
+  Future<void> updateProgressForLike() async {
+    final currentUser = await _ref.read(currentUserDetailsProvider.future);
+    if (currentUser == null) return;
+
+    final updatedUser = _progressService.updateProgressForLike(currentUser);
     await _syncProgressWithAppwrite(updatedUser);
   }
 
-  Future<void> updateProgressForDailyLogin(UserModel user) async {
-    final updatedUser = _progressService.updateProgressForDailyLogin(user);
+  Future<void> updateProgressForDailyLogin() async {
+    final currentUser = await _ref.read(currentUserDetailsProvider.future);
+    if (currentUser == null) return;
+
+    final updatedUser = _progressService.updateProgressForDailyLogin(currentUser);
     await _syncProgressWithAppwrite(updatedUser);
   }
 
-  Future<void> updateProgressForSteps(UserModel user, int steps) async {
-    // Get the current steps from the leaderboard
-    final leaderboardResult = await _progressAPI.getLeaderboard();
-    int? previousSteps;
-    
-    leaderboardResult.fold(
-      (l) => null,
-      (r) {
-        final docs = (r['documents'] as List<dynamic>? ?? []);
-        for (var doc in docs) {
-          final data = doc['data'] ?? {};
-          if (data['uid'] == user.uid) {
-            previousSteps = data['steps'] ?? 0;
-            break;
-          }
-        }
-      },
-    );
+  Future<void> updateProgressForSteps(int steps, {int? previousSteps}) async {
+    final currentUser = await _ref.read(currentUserDetailsProvider.future);
+    if (currentUser == null) return;
 
-    final updatedUser = _progressService.updateProgressForSteps(user, steps, previousSteps: previousSteps);
-    
-    // Update the leaderboard steps
-    await _progressAPI.updateLeaderboardSteps(user.uid, steps);
-    
-    // Update other user progress
+    final updatedUser = _progressService.updateProgressForSteps(currentUser, steps, previousSteps: previousSteps);
     await _syncProgressWithAppwrite(updatedUser);
   }
 
-  Future<void> updateProgressForNewFollower(UserModel user) async {
-    final updatedUser = _progressService.updateProgressForNewFollower(user);
+  Future<void> updateProgressForComment() async {
+    final currentUser = await _ref.read(currentUserDetailsProvider.future);
+    if (currentUser == null) return;
+
+    final updatedUser = _progressService.updateProgressForComment(currentUser);
     await _syncProgressWithAppwrite(updatedUser);
   }
 
-  Future<void> updateProgressForComment(UserModel user) async {
-    final updatedUser = _progressService.updateProgressForComment(user);
+  Future<void> updateProgressForFollower() async {
+    final currentUser = await _ref.read(currentUserDetailsProvider.future);
+    if (currentUser == null) return;
+
+    final updatedUser = _progressService.updateProgressForFollower(currentUser);
     await _syncProgressWithAppwrite(updatedUser);
+  }
+
+  Future<void> loadUserProgress() async {
+    try {
+      final currentUser = await _ref.read(currentUserDetailsProvider.future);
+      if (currentUser == null) {
+        state = const AsyncValue.data(null);
+        return;
+      }
+      state = AsyncValue.data(currentUser);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
   }
 
   // Get level benefits
@@ -98,29 +121,5 @@ class ProgressController extends StateNotifier<AsyncValue<UserModel?>> {
     }
 
     await _syncProgressWithAppwrite(updatedUser);
-  }
-
-  // Helper method to sync progress with Appwrite
-  Future<void> _syncProgressWithAppwrite(UserModel user) async {
-    try {
-      print('[DEBUG] _syncProgressWithAppwrite: user=${user.toString()}');
-      // Update user progress in users collection
-      final userResult = await _progressAPI.updateUserProgress(user);
-      userResult.fold(
-        (l) => throw Exception(l.massage),
-        (r) => null,
-      );
-
-      // Update leaderboard
-      final leaderboardResult = await _progressAPI.updateLeaderboard(user);
-      leaderboardResult.fold(
-        (l) => throw Exception(l.massage),
-        (r) => null,
-      );
-
-      state = AsyncValue.data(user);
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-    }
   }
 } 
