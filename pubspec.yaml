@@ -61,6 +61,7 @@ flutter:
     - assets/svgs/
     - assets/global_photos/
     - assets/global_avatars/
+    - assets/models/
 
   fonts:
     - family: Montserrat
