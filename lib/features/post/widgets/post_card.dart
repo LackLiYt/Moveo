@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moveo/constants/assets_constants.dart';
 import 'package:moveo/features/post/widgets/hashtag_text.dart';
 import 'package:moveo/models/post_model.dart';
 import 'package:moveo/common/common.dart';
@@ -7,10 +8,56 @@ import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/models/user_model.dart';
 import 'package:moveo/theme/theme.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:moveo/features/post/widgets/comment_post.dart';
+
+class LikeButton extends StatefulWidget {
+  final int likeCount;
+
+  const LikeButton({super.key, required this.likeCount});
+
+  @override
+  State<LikeButton> createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<LikeButton> {
+  bool isLiked = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              isLiked = !isLiked;
+            });
+          },
+          icon: Icon(
+            isLiked ? Icons.favorite : Icons.favorite_border,
+            color: isLiked ? Colors.red : Colors.grey,
+            size: 25,
+          ),
+        ),
+        Text(
+          '${widget.likeCount + (isLiked ? 1 : 0)}',
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Pallete.whiteColor
+                : Pallete.backgroundColor,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 
 class PostCard extends ConsumerWidget {
   final Post post;
   const PostCard({super.key, required this.post});
+
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -155,34 +202,34 @@ class PostCard extends ConsumerWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CommentsScreen(post: post),
+                            ),
+                          );
+                        },
                         icon: const Icon(
                           Icons.comment_outlined,
                           size: 20,
                         ),
                       ),
-                      Text('${post.commentIds.length}',
+                      Text(
+                        '${post.commentIds.length}',
                         style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Pallete.whiteColor
+                              : Pallete.backgroundColor,
                         ),
                       ),
                       const SizedBox(width: 16),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.favorite_outline,
-                          size: 20,
-                        ),
-                      ),
-                      Text('${post.likes.length}',
-                        style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
-                        ),
-                      ),
+                      LikeButton(likeCount: post.likes.length),
                     ],
                   ),
                 ),
-                
+
+
                 const Divider(),
               ],
             );
