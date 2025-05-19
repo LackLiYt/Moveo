@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/ui_constants.dart';
+import 'package:moveo/features/global/global_images_buttons/events.dart';
+import 'package:moveo/features/global/global_images_buttons/hero.dart';
 
 
 class GlobalPageView extends StatelessWidget {
@@ -9,7 +11,7 @@ class GlobalPageView extends StatelessWidget {
       );
 
   const GlobalPageView({super.key});
-  
+
 
   @override
   Widget build(BuildContext context) {
@@ -155,17 +157,20 @@ Widget build(BuildContext context) {
             children: [
               _buildImageButton(
                 imagePath: 'assets/global_photos/events.jpg',
-                onPressed: () => print('Clicked Events'),
+                onPressed: () => {print('Clicked Events'),
+                Navigator.push(context, Events_Page.route())
+                },
                 text: 'Events',
               ),
               _buildImageButton(
                 imagePath: 'assets/global_photos/armory.jpg',
-                onPressed: () => print('Clicked Armory'),
+                onPressed: () => {print('Clicked Armory'),},
                 text: 'Armory',
               ),
               _buildImageButton(
                 imagePath: 'assets/global_photos/hero.jpg',
-                onPressed: () => print('Clicked Hero'),
+                onPressed: () => {print('Clicked Hero'),
+                Navigator.push(context, Hero_Page.route())},
                 text: 'Hero',
               ),
               _buildImageButton(
