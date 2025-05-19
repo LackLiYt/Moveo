@@ -22,19 +22,19 @@ class UiConstants {
         height: 24, // Make the title smaller
       ),
       actions: [
-        IconButton(
-          icon: Icon(
-            Icons.chat_bubble_outline,
-            color: Theme.of(context).brightness == Brightness.light
-                ? Colors.black
-                : Colors.white,
-          ),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) => const ChatPageView(),
-            ));
-          },
-        ),
+        // IconButton(\
+        //   icon: Icon(\
+        //     Icons.chat_bubble_outline,\
+        //     color: Theme.of(context).brightness == Brightness.light\
+        //         ? Colors.black\
+        //         : Colors.white,\
+        //   ),\
+        //   onPressed: () {\
+        //     Navigator.push(context, MaterialPageRoute(\
+        //       builder: (context) => const ChatPageView(),\
+        //     ));\
+        //   },\
+        // ),\
         const SizedBox(width: 8), // Add some padding
       ],
     );

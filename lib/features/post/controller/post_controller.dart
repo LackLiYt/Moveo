@@ -147,7 +147,7 @@ class PostController extends StateNotifier<bool> {
                 // Convert document to UserModel
                 final user = UserModel.fromMap(document.data);
                 // Update user progress for creating a post
-                await _ref.read(progressControllerProvider.notifier).updateProgressForPost(user);
+                await _ref.read(progressControllerProvider.notifier).updateProgressForPost();
                 showSnackBar(context, 'Post shared successfully!');
                 Navigator.pop(context); // Close the post creation screen
               },

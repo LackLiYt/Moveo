@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/ui_constants.dart';
 import 'package:moveo/features/global/global_images_buttons/events.dart';
 import 'package:moveo/features/global/global_images_buttons/hero.dart';
