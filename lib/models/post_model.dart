@@ -9,9 +9,10 @@ class Post {
   final String? link; // Optional link in text
   final String uid; // User ID
   final DateTime createdAt;
-  final List<String> likes;
   final List<String> commentIds;
   final String id;
+  final int likesCount;  // Add this field
+  final int commentsCount;  // Add this field
 
   const Post({
     required this.rearCameraPhotoUrl,
@@ -21,9 +22,10 @@ class Post {
     this.link,
     required this.uid,
     required this.createdAt,
-    required this.likes,
     required this.commentIds,
     required this.id,
+    this.likesCount = 0,  // Default to 0
+    this.commentsCount = 0,  // Default to 0
   });
 
   Post copyWith({
@@ -34,9 +36,10 @@ class Post {
     String? link,
     String? uid,
     DateTime? createdAt,
-    List<String>? likes,
     List<String>? commentIds,
     String? id,
+    int? likesCount,
+    int? commentsCount,
   }) {
     return Post(
       rearCameraPhotoUrl: rearCameraPhotoUrl ?? this.rearCameraPhotoUrl,
@@ -46,9 +49,10 @@ class Post {
       link: link ?? this.link,
       uid: uid ?? this.uid,
       createdAt: createdAt ?? this.createdAt,
-      likes: likes ?? this.likes,
       commentIds: commentIds ?? this.commentIds,
       id: id ?? this.id,
+      likesCount: likesCount ?? this.likesCount,
+      commentsCount: commentsCount ?? this.commentsCount,
     );
   }
 
@@ -62,8 +66,9 @@ class Post {
     if (link != null) result.addAll({'link': link});
     result.addAll({'uid': uid});
     result.addAll({'createdAt': createdAt.millisecondsSinceEpoch});
-    result.addAll({'likes': likes});
     result.addAll({'commentIds': commentIds});
+    result.addAll({'likesCount': likesCount});
+    result.addAll({'commentsCount': commentsCount});
 
     return result;
   }
@@ -77,15 +82,16 @@ class Post {
       link: map['link'] as String?,
       uid: map['uid'] as String,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
-      likes: List<String>.from(map['likes'] ?? []),
       commentIds: List<String>.from(map['commentIds'] ?? []),
       id: map['\$id'] as String,
+      likesCount: map['likesCount'] ?? 0,
+      commentsCount: map['commentsCount'] ?? 0,
     );
   }
 
   @override
   String toString() {
-    return 'Post(rearCameraPhotoUrl: $rearCameraPhotoUrl, frontCameraPhotoUrl: $frontCameraPhotoUrl, text: $text, hashtags: $hashtags, link: $link, uid: $uid, createdAt: $createdAt, likes: $likes, commentIds: $commentIds, id: $id)';
+    return 'Post(rearCameraPhotoUrl: $rearCameraPhotoUrl, frontCameraPhotoUrl: $frontCameraPhotoUrl, text: $text, hashtags: $hashtags, link: $link, uid: $uid, createdAt: $createdAt, commentIds: $commentIds, id: $id, likesCount: $likesCount, commentsCount: $commentsCount)';
   }
 
   @override
@@ -100,9 +106,10 @@ class Post {
       other.link == link &&
       other.uid == uid &&
       other.createdAt == createdAt &&
-      listEquals(other.likes, likes) &&
       listEquals(other.commentIds, commentIds) &&
-      other.id == id;
+      other.id == id &&
+      other.likesCount == likesCount &&
+      other.commentsCount == commentsCount;
   }
 
   @override
@@ -114,8 +121,9 @@ class Post {
       link.hashCode ^
       uid.hashCode ^
       createdAt.hashCode ^
-      likes.hashCode ^
       commentIds.hashCode ^
-      id.hashCode;
+      id.hashCode ^
+      likesCount.hashCode ^
+      commentsCount.hashCode;
   }
 }

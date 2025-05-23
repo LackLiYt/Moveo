@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:health/health.dart';
 import 'package:moveo/features/health/health_data.dart';
 import 'package:moveo/features/progress/controller/progress_controller.dart';
-import 'package:moveo/features/auth/controller/auth_controller.dart';
 
 final healthProvider = Provider((ref) => Health());
 

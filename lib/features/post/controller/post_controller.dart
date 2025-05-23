@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/apis/post_api.dart';
 import 'package:moveo/apis/storage_api.dart';
+import 'package:moveo/apis/interaction_api.dart';
 import 'package:moveo/core/utils.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
 import 'package:moveo/models/post_model.dart';
+import 'package:moveo/models/like_model.dart';
+import 'package:moveo/models/comment_model.dart';
 import 'package:moveo/features/progress/controller/progress_controller.dart';
 import 'package:moveo/models/user_model.dart';
 
@@ -14,6 +17,7 @@ final postControllerProvider = StateNotifierProvider<PostController, bool>((ref)
     ref: ref,
     postAPI: ref.watch(postAPIProvider),
     storageAPI: ref.watch(storageAPIProvider),
+    interactionAPI: ref.watch(interactionAPIProvider),
   );
 });
 
@@ -45,14 +49,18 @@ class PostController extends StateNotifier<bool> {
   final PostAPI _postAPI;
   final Ref _ref;
   final StorageAPI _storage;
+  final InteractionAPI _interactionAPI;
+
   PostController({
     required Ref ref,
     required PostAPI postAPI,
     required StorageAPI storageAPI,
+    required InteractionAPI interactionAPI,
   }):
     _ref = ref,
     _postAPI = postAPI,
     _storage = storageAPI,
+    _interactionAPI = interactionAPI,
     super(false);
 
   Future<List<Post>> getPosts() async {
@@ -125,9 +133,10 @@ class PostController extends StateNotifier<bool> {
         link: link,
         uid: userId,
         createdAt: DateTime.now(),
-        likes: const [],
         commentIds: const [],
         id: '',
+        likesCount: 0,
+        commentsCount: 0,
       );
 
       // Debug data before submitting
@@ -183,5 +192,69 @@ class PostController extends StateNotifier<bool> {
       }
     }
     return hastags;
+  }
+
+  Future<void> toggleLike(String postId, String userId) async {
+    try {
+      final like = Like(
+        id: '', // Will be set by Appwrite
+        postId: postId,
+        uid: userId,
+        createdAt: DateTime.now(),
+      );
+
+      final result = await _interactionAPI.toggleLike(like);
+      
+      result.fold(
+        (failure) => debugPrint('Error toggling like: ${failure.massage}'),
+        (_) async {
+          // Update user progress for liking
+          await _ref.read(progressControllerProvider.notifier).updateProgressForLike();
+        },
+      );
+    } catch (e) {
+      debugPrint('Error toggling like: $e');
+    }
+  }
+
+  Future<void> addComment(String postId, String userId, String text) async {
+    try {
+      final comment = Comment(
+        id: '', // Will be set by Appwrite
+        postId: postId,
+        uid: userId,
+        text: text,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      final result = await _interactionAPI.addComment(comment);
+      
+      result.fold(
+        (failure) => debugPrint('Error adding comment: ${failure.massage}'),
+        (_) async {
+          // Update user progress for commenting
+          await _ref.read(progressControllerProvider.notifier).updateProgressForComment();
+        },
+      );
+    } catch (e) {
+      debugPrint('Error adding comment: $e');
+    }
+  }
+
+  Future<List<Comment>> getCommentsForPost(String postId) async {
+    try {
+      final result = await _interactionAPI.getCommentsForPost(postId);
+      return result.fold(
+        (failure) {
+          debugPrint('Error getting comments: ${failure.massage}');
+          return [];
+        },
+        (comments) => comments,
+      );
+    } catch (e) {
+      debugPrint('Error getting comments: $e');
+      return [];
+    }
   }
 }

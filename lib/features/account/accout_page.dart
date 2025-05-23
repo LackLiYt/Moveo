@@ -160,7 +160,6 @@ void initState() {
                               const SizedBox(height: 12),
                               Center(
     child: ElevatedButton(
-      child: const Text("Customize Character"),
       onPressed: () async {
         final result = await Navigator.push(
           context,
@@ -179,6 +178,7 @@ void initState() {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+      child: const Text("Customize Character"),
     ),
   ),
   const SizedBox(height: 16),

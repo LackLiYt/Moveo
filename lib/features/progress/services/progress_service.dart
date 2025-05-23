@@ -29,6 +29,13 @@ class ProgressService {
       .addExperience(EXP_PER_LIKE);
   }
   
+  // Update user progress for adding a comment
+  UserModel updateProgressForComment(UserModel user) {
+    return user
+      .addPoints(POINTS_PER_COMMENT)
+      .addExperience(EXP_PER_COMMENT);
+  }
+  
   // Update user progress for daily login
   UserModel updateProgressForDailyLogin(UserModel user) {
     return user
@@ -53,13 +60,6 @@ class ProgressService {
     return user
       .addPoints(pointsFromSteps)
       .addExperience(expFromSteps);
-  }
-
-  // Update user progress for comment
-  UserModel updateProgressForComment(UserModel user) {
-    return user
-      .addPoints(POINTS_PER_COMMENT)
-      .addExperience(EXP_PER_COMMENT);
   }
 
   // Update user progress for follower

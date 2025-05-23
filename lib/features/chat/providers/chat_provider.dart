@@ -4,11 +4,32 @@ import 'package:moveo/models/chat_model.dart';
 import 'package:moveo/features/chat/controllers/chat_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/apis/chat_api.dart';
+import 'package:moveo/models/chat_model.dart'; // This file contains ChatModel and ChatMessage
 
 final chatProvider = StateNotifierProvider<ChatNotifier, AsyncValue<List<ChatModel>>>((ref) {
   return ChatNotifier(
     chatAPI: ref.watch(chatAPIProvider),
   );
+});
+
+final chatMessagesProvider = StreamProvider.family<List<ChatMessage>, String>((ref, chatId) async* {
+  final chatAPI = ref.watch(chatAPIProvider);
+  
+  // Fetch initial messages
+  final initialMessages = await chatAPI.getMessagesForChat(chatId);
+  yield initialMessages;
+
+  // Subscribe to real-time updates
+  await for (final realtimeMessage in chatAPI.subscribeToMessages(chatId)) {
+    // Assuming realtimeMessage.payload contains the new message data
+    // You might need to adjust based on the actual structure of RealtimeMessage
+    final newMessageData = realtimeMessage.payload;
+    if (newMessageData != null) {
+      final newMessage = ChatMessage.fromMap(newMessageData as Map<String, dynamic>);
+      // To show new messages at the bottom, we add them to the end of the list
+      yield [...initialMessages, newMessage];
+    }
+  }
 });
 
 class ChatNotifier extends StateNotifier<AsyncValue<List<ChatModel>>> {
@@ -79,7 +100,7 @@ class ChatNotifier extends StateNotifier<AsyncValue<List<ChatModel>>> {
       }
       return null; // Should not happen if creation was successful
 
-    } catch (e, st) {
+    } catch (e) {
       // Handle errors (e.g., show a snackbar)
       print('Error finding or creating chat: $e');
       return null;

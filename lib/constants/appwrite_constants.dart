@@ -12,8 +12,8 @@ class AppwriteConstants {
   static const String chatsCollectionId = 'chats';
   static const String messagesCollectionId = 'messages';
 
-  // Comments Collection
   static const String commentsCollectionId = '682adaf50018719725d6';
+  static const String likesCollectionId = '682cabc00000a92b509f';  
 
   static const String imagesBucketId = '6796730c003d58e79e62';
   static String imageUrl(String imageId) => '$endPoint/storage/buckets/$imagesBucketId/files/$imageId/view?project=$projectId';

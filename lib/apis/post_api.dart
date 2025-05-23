@@ -20,6 +20,8 @@ abstract class IPostAPI {
   Future<List<Document>> getPostsByUserId(String userId);
   Stream<RealtimeMessage> getLatestPosts();
   Stream<RealtimeMessage> getLatestPostsByUserId(String userId);
+  Future<void> toggleLike(String postId, String userId);
+  Future<bool> hasUserLikedPost(String postId, String userId);
 }
 
 class PostAPI implements IPostAPI {
@@ -67,6 +69,9 @@ class PostAPI implements IPostAPI {
       final documents = await _db.listDocuments(
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.postCollectionId,
+        queries: [
+          Query.orderDesc('createdAt'),
+        ],
       );
       return documents.documents;
   }
@@ -91,5 +96,86 @@ class PostAPI implements IPostAPI {
   @override
   Stream<RealtimeMessage> getLatestPostsByUserId(String userId) {
      return _realtime.subscribe(['databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.postCollectionId}.documents']).stream.where((event) => event.events.contains('databases.*.collections.*.documents.*.create') && (event.payload)['uid'] == userId);
+  }
+
+  @override
+  Future<void> toggleLike(String postId, String userId) async {
+    // Check if like exists
+    final existingLikes = await _db.listDocuments(
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.likesCollectionId,
+      queries: [
+        Query.equal('postId', postId),
+        Query.equal('uid', userId),
+      ],
+    );
+
+    if (existingLikes.documents.isEmpty) {
+      // Add like
+      await _db.createDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.likesCollectionId,
+        documentId: ID.unique(),
+        data: {
+          'postId': postId,
+          'uid': userId,
+          'createdAt': DateTime.now().toIso8601String(),
+        },
+      );
+      
+      // Get current likes count
+      final post = await _db.getDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.postCollectionId,
+        documentId: postId,
+      );
+      
+      // Increment likes count
+      await _db.updateDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.postCollectionId,
+        documentId: postId,
+        data: {
+          'likesCount': (post.data['likesCount'] ?? 0) + 1,
+        },
+      );
+    } else {
+      // Remove like
+      await _db.deleteDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.likesCollectionId,
+        documentId: existingLikes.documents.first.$id,
+      );
+      
+      // Get current likes count
+      final post = await _db.getDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.postCollectionId,
+        documentId: postId,
+      );
+      
+      // Decrement likes count
+      await _db.updateDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.postCollectionId,
+        documentId: postId,
+        data: {
+          'likesCount': (post.data['likesCount'] ?? 0) - 1,
+        },
+      );
+    }
+  }
+
+  @override
+  Future<bool> hasUserLikedPost(String postId, String userId) async {
+    final response = await _db.listDocuments(
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.likesCollectionId,
+      queries: [
+        Query.equal('postId', postId),
+        Query.equal('uid', userId),
+      ],
+    );
+    return response.documents.isNotEmpty;
   }
 }

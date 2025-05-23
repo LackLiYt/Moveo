@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/features/chat/views/add_chat_page.dart';
 import 'package:moveo/features/chat/providers/chat_provider.dart';
-import 'package:moveo/models/chat_model.dart';
-import 'package:moveo/features/chat/views/chat_view.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
+import 'package:moveo/features/chat/views/chat_view.dart';
 
 class ChatPageView extends ConsumerStatefulWidget {
   const ChatPageView({super.key});
@@ -67,7 +66,12 @@ class _ChatPageViewState extends ConsumerState<ChatPageView> {
                     ),
                     title: Text(chat.otherUserName),
                     onTap: () {
-                      // TODO: Implement chat view navigation or placeholder
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatView(chat: chat),
+                        ),
+                      );
                     },
                   );
                 },

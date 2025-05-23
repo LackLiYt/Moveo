@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/features/chat/providers/chat_provider.dart';
 import 'package:moveo/models/chat_model.dart';
+import 'package:moveo/features/chat/widgets/chat_message_tile.dart';
+import 'package:moveo/features/auth/controller/auth_controller.dart';
 
 class ChatView extends ConsumerStatefulWidget {
   final ChatModel chat;
@@ -37,6 +39,9 @@ class _ChatViewState extends ConsumerState<ChatView> {
 
   @override
   Widget build(BuildContext context) {
+    final messagesAsyncValue = ref.watch(chatMessagesProvider(widget.chat.id));
+    final currentUser = ref.watch(currentUserAccountProvider).value;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -52,12 +57,23 @@ class _ChatViewState extends ConsumerState<ChatView> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              reverse: true,
-              itemCount: 0, // TODO: Implement message list
-              itemBuilder: (context, index) {
-                return const SizedBox(); // TODO: Implement message item
+            child: messagesAsyncValue.when(
+              data: (messages) {
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    final isCurrentUser = currentUser != null && message.senderId == currentUser.$id;
+                    return ChatMessageTile(
+                      message: message,
+                      isCurrentUser: isCurrentUser,
+                    );
+                  },
+                );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stackTrace) => Center(child: Text('Error: ${error.toString()}')),
             ),
           ),
           Padding(
