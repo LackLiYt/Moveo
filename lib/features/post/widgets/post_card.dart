@@ -8,8 +8,6 @@ import 'package:moveo/models/user_model.dart';
 import 'package:moveo/theme/theme.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:moveo/features/post/widgets/comment_post.dart';
-import 'package:moveo/features/post/controller/post_controller.dart';
-import 'package:moveo/apis/post_api.dart';
 import 'package:moveo/apis/interaction_api.dart';
 import 'package:moveo/models/like_model.dart';
 

@@ -2,7 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart' as model;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:moveo/constants/constants.dart';
+import 'package:moveo/constants/appwrite_constants.dart';
 import 'package:moveo/core/core.dart';
 import 'package:moveo/core/providers.dart';
 import 'package:moveo/models/user_model.dart';
@@ -16,6 +16,7 @@ final userAPIProvider = Provider((ref) {
 abstract class IUserAPI {
   FutureEitherVoid saveUserData(UserModel userModel);
   FutureEither<model.Document> getUserData(String uid);
+  FutureEither<List<model.Document>> getAllUsers();
 }
 
 class UserAPI implements IUserAPI {
@@ -53,6 +54,21 @@ class UserAPI implements IUserAPI {
       return right(document);
     } on AppwriteException catch (e, st) {
       return left(Failure(e.message ?? 'Error fetching user data', st));
+    } catch (e, st) {
+      return left(Failure(e.toString(), st));
+    }
+  }
+
+  @override
+  FutureEither<List<model.Document>> getAllUsers() async {
+    try {
+      final response = await _db.listDocuments(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.usersCollectionId,
+      );
+      return right(response.documents);
+    } on AppwriteException catch (e, st) {
+      return left(Failure(e.message ?? 'Error fetching users', st));
     } catch (e, st) {
       return left(Failure(e.toString(), st));
     }

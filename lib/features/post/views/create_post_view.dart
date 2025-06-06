@@ -25,6 +25,7 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
   File? _rearPhoto;
   File? _frontPhoto;
   bool _isLoading = true;
+  bool _isFlashOn = false;
   final TextEditingController _textController = TextEditingController();
 
   @override
@@ -70,10 +71,8 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
       // Find the right camera
       CameraDescription? camera;
       if (_cameras!.length == 1) {
-        // Only one camera available, use it regardless
         camera = _cameras![0];
       } else {
-        // Try to find the requested camera type
         for (var cam in _cameras!) {
           if ((useRearCamera && cam.lensDirection == CameraLensDirection.back) ||
               (!useRearCamera && cam.lensDirection == CameraLensDirection.front)) {
@@ -81,25 +80,40 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
             break;
           }
         }
-        // Fall back to the first camera if we couldn't find the right one
         camera ??= _cameras![0];
       }
 
-      // Create and initialize the controller with error handling
+      // Create and initialize the controller with higher quality settings
       _cameraController = CameraController(
         camera,
-        ResolutionPreset.medium,
+        ResolutionPreset.high,
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.jpeg,
       );
 
-      // Add timeout to initialization
       await _cameraController!.initialize().timeout(
         const Duration(seconds: 5),
         onTimeout: () {
           throw TimeoutException('Camera initialization timed out');
         },
       );
+
+      // Set initial flash mode based on camera type
+      if (!useRearCamera) {
+        // Enable flash for selfie camera
+        await _cameraController!.setFlashMode(FlashMode.torch);
+        setState(() => _isFlashOn = true);
+      } else {
+        // For rear camera, check light conditions
+        final lightLevel = await _cameraController!.getMinExposureOffset();
+        if (lightLevel < -2.0) { // Low light condition
+          await _cameraController!.setFlashMode(FlashMode.auto);
+          setState(() => _isFlashOn = true);
+        } else {
+          await _cameraController!.setFlashMode(FlashMode.off);
+          setState(() => _isFlashOn = false);
+        }
+      }
       
       if (mounted) {
         setState(() {
@@ -112,7 +126,6 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
         showSnackBar(context, 'Failed to initialize camera: $e');
         setState(() => _isLoading = false);
       }
-      // Re-throw to be handled by the caller
       rethrow;
     }
   }
@@ -184,6 +197,43 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
     }
   }
 
+  Future<void> _toggleFlash() async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      return;
+    }
+
+    try {
+      FlashMode newMode;
+      if (_isRearCamera) {
+        // For rear camera, cycle through: off -> auto -> on
+        switch (_cameraController!.value.flashMode) {
+          case FlashMode.off:
+            newMode = FlashMode.auto;
+            break;
+          case FlashMode.auto:
+            newMode = FlashMode.always;
+            break;
+          default:
+            newMode = FlashMode.off;
+        }
+      } else {
+        // For front camera, toggle between torch and off
+        newMode = _cameraController!.value.flashMode == FlashMode.torch 
+            ? FlashMode.off 
+            : FlashMode.torch;
+      }
+
+      await _cameraController!.setFlashMode(newMode);
+      setState(() {
+        _isFlashOn = newMode != FlashMode.off;
+      });
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, 'Failed to toggle flash: $e');
+      }
+    }
+  }
+
   void _sharePost() {
     if (_rearPhoto == null || _frontPhoto == null) {
       showSnackBar(context, 'Please take both front and rear photos');
@@ -231,21 +281,25 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                       color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          'New post',
-                          style: TextStyle(
-                            color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_down,
+                    if (!isCapturingComplete)
+                      Text(
+                        _isRearCamera ? 'Take rear photo' : 'Take selfie',
+                        style: TextStyle(
                           color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ],
-                    ),
+                      )
+                    else
+                      Text(
+                        'Preview',
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    const SizedBox(width: 40), // Balance the header
                   ],
                 ),
               ),
@@ -274,11 +328,14 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                // Flash Icon
-                                Icon(
-                                  Icons.flash_on,
-                                  color: Pallete.whiteColor,
-                                  size: 30,
+                                // Flash Icon with state indicator
+                                GestureDetector(
+                                  onTap: _toggleFlash,
+                                  child: Icon(
+                                    _isFlashOn ? Icons.flash_on : Icons.flash_off,
+                                    color: _isFlashOn ? Pallete.blueColor : Pallete.whiteColor,
+                                    size: 30,
+                                  ),
                                 ),
                                 // Flip Camera Icon
                                 GestureDetector(
@@ -292,26 +349,35 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            // Front/Rear indicators
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'front',
-                                  style: TextStyle(
-                                    color: !_isRearCamera ? Pallete.whiteColor : Pallete.greyColor,
-                                    fontSize: 16,
+                            // Front/Rear indicators with improved styling
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'front',
+                                    style: TextStyle(
+                                      color: !_isRearCamera ? Pallete.whiteColor : Pallete.greyColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 16),
-                                Text(
-                                  'rear',
-                                  style: TextStyle(
-                                    color: _isRearCamera ? Pallete.whiteColor : Pallete.greyColor,
-                                    fontSize: 16,
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    'rear',
+                                    style: TextStyle(
+                                      color: _isRearCamera ? Pallete.whiteColor : Pallete.greyColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -405,6 +471,13 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white, width: 2),
                     borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(6),
@@ -420,24 +493,65 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
         ),
         
         // Caption input and Post button
-        Padding(
-          padding: const EdgeInsets.all(16.0),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Pallete.backgroundColor 
+                : Pallete.whiteColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
+            top: 16.0,
+          ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: _textController,
-                decoration: InputDecoration(
-                  hintText: 'Add a caption...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _textController,
+                      decoration: InputDecoration(
+                        hintText: 'Add a caption...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).brightness == Brightness.dark 
+                            ? Pallete.darkGreyColor 
+                            : Pallete.greyColor.withOpacity(0.2),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0),
+                      ),
+                      maxLines: 3,
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? Pallete.whiteColor 
+                            : Pallete.backgroundColor
+                      ),
+                      onSubmitted: (_) {
+                        FocusScope.of(context).unfocus();
+                      },
+                    ),
                   ),
-                  filled: true,
-                  fillColor: Theme.of(context).brightness == Brightness.dark ? Pallete.darkGreyColor : Pallete.greyColor.withOpacity(0.2),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 15.0),
-                ),
-                maxLines: 3,
-                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Pallete.whiteColor : Pallete.backgroundColor)),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.keyboard_hide),
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: isCapturingComplete && !isPostingLoading ? _sharePost : null,
@@ -448,14 +562,16 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   minimumSize: const Size(double.infinity, 50),
+                  elevation: 2,
                 ),
                 child: isPostingLoading
                     ? const CircularProgressIndicator(color: Pallete.whiteColor)
                     : const Text(
-                        'Post',
+                        'Share',
                         style: TextStyle(
                           fontSize: 18.0,
                           color: Pallete.whiteColor,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
               ),

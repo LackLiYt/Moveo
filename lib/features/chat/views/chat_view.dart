@@ -19,6 +19,7 @@ class ChatView extends ConsumerStatefulWidget {
 
 class _ChatViewState extends ConsumerState<ChatView> {
   final messageController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -26,15 +27,27 @@ class _ChatViewState extends ConsumerState<ChatView> {
     super.dispose();
   }
 
-  void sendMessage() {
+  Future<void> sendMessage() async {
     if (messageController.text.trim().isEmpty) return;
     
-    ref.read(chatProvider.notifier).sendMessage(
-      widget.chat.id,
-      messageController.text.trim(),
-    );
-    
-    messageController.clear();
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(chatProvider.notifier).sendMessage(
+        widget.chat.id,
+        messageController.text.trim(),
+      );
+      messageController.clear();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error sending message: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -47,10 +60,27 @@ class _ChatViewState extends ConsumerState<ChatView> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(widget.chat.otherUserProfilePic),
+              backgroundImage: widget.chat.otherUserProfilePic.isNotEmpty
+                  ? NetworkImage(widget.chat.otherUserProfilePic)
+                  : null,
+              child: widget.chat.otherUserProfilePic.isEmpty
+                  ? const Icon(Icons.person)
+                  : null,
             ),
             const SizedBox(width: 8),
-            Text(widget.chat.otherUserName),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.chat.otherUserName),
+                const Text(
+                  'Friend',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -59,12 +89,18 @@ class _ChatViewState extends ConsumerState<ChatView> {
           Expanded(
             child: messagesAsyncValue.when(
               data: (messages) {
+                if (messages.isEmpty) {
+                  return const Center(
+                    child: Text('No messages yet. Start the conversation!'),
+                  );
+                }
+
                 return ListView.builder(
                   reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    final message = messages[index];
-                    final isCurrentUser = currentUser != null && message.senderId == currentUser.$id;
+                    final message = messages[messages.length - 1 - index];
+                    final isCurrentUser = message.senderId == currentUser?.$id;
                     return ChatMessageTile(
                       message: message,
                       isCurrentUser: isCurrentUser,
@@ -73,7 +109,9 @@ class _ChatViewState extends ConsumerState<ChatView> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) => Center(child: Text('Error: ${error.toString()}')),
+              error: (error, stack) => Center(
+                child: Text('Error loading messages: $error'),
+              ),
             ),
           ),
           Padding(
@@ -87,11 +125,19 @@ class _ChatViewState extends ConsumerState<ChatView> {
                       hintText: 'Type a message...',
                       border: OutlineInputBorder(),
                     ),
+                    enabled: !_isLoading,
                   ),
                 ),
+                const SizedBox(width: 8),
                 IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: sendMessage,
+                  onPressed: _isLoading ? null : sendMessage,
+                  icon: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(),
+                        )
+                      : const Icon(Icons.send),
                 ),
               ],
             ),

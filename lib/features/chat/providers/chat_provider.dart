@@ -4,7 +4,7 @@ import 'package:moveo/models/chat_model.dart';
 import 'package:moveo/features/chat/controllers/chat_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moveo/apis/chat_api.dart';
-import 'package:moveo/models/chat_model.dart'; // This file contains ChatModel and ChatMessage
+import 'package:moveo/features/auth/controller/auth_controller.dart';
 
 final chatProvider = StateNotifierProvider<ChatNotifier, AsyncValue<List<ChatModel>>>((ref) {
   return ChatNotifier(
@@ -24,12 +24,10 @@ final chatMessagesProvider = StreamProvider.family<List<ChatMessage>, String>((r
     // Assuming realtimeMessage.payload contains the new message data
     // You might need to adjust based on the actual structure of RealtimeMessage
     final newMessageData = realtimeMessage.payload;
-    if (newMessageData != null) {
-      final newMessage = ChatMessage.fromMap(newMessageData as Map<String, dynamic>);
-      // To show new messages at the bottom, we add them to the end of the list
-      yield [...initialMessages, newMessage];
+    final newMessage = ChatMessage.fromMap(newMessageData);
+    // To show new messages at the bottom, we add them to the end of the list
+    yield [...initialMessages, newMessage];
     }
-  }
 });
 
 class ChatNotifier extends StateNotifier<AsyncValue<List<ChatModel>>> {
@@ -40,10 +38,10 @@ class ChatNotifier extends StateNotifier<AsyncValue<List<ChatModel>>> {
   })  : _chatAPI = chatAPI,
         super(const AsyncValue.loading());
 
-  Future<void> loadChats(String userId) async {
+  Future<void> loadChats(String uid) async {
     state = const AsyncValue.loading();
     try {
-      final chats = await _chatAPI.getUserChats(userId);
+      final chats = await _chatAPI.getUserChats(uid);
       state = AsyncValue.data(chats);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -54,7 +52,7 @@ class ChatNotifier extends StateNotifier<AsyncValue<List<ChatModel>>> {
     try {
       await _chatAPI.sendMessage(chatId, message);
       // Reload chats to get the updated list
-      final currentUser = state.value?.firstOrNull?.userId;
+      final currentUser = state.value?.firstOrNull?.uid;
       if (currentUser != null) {
         await loadChats(currentUser);
       }
@@ -63,47 +61,48 @@ class ChatNotifier extends StateNotifier<AsyncValue<List<ChatModel>>> {
     }
   }
 
-  Future<void> createChat(String otherUserId) async {
+  Future<void> createChat(String currentUid, String otherUid) async {
     try {
-      await _chatAPI.createChat(otherUserId);
+      await _chatAPI.createChat(currentUid, otherUid);
       // Reload chats to get the updated list
-      final currentUser = state.value?.firstOrNull?.userId;
-      if (currentUser != null) {
-        await loadChats(currentUser);
-      }
+      await loadChats(currentUid);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
   }
 
-  Future<ChatModel?> findOrCreateChat(String currentUserId, String otherUserId) async {
+  Future<ChatModel?> findOrCreateChat(String currentUid, String otherUid) async {
     try {
+      // Check if users can chat
+      final canChat = await _chatAPI.canChatWithUser(currentUid, otherUid);
+      if (!canChat) {
+        throw Exception('Cannot chat with this user: You are not friends');
+      }
+
       // Try to find an existing chat
-      final existingChats = await _chatAPI.getUserChats(currentUserId);
+      final existingChats = await _chatAPI.getUserChats(currentUid);
       for (var chat in existingChats) {
-        if ((chat.userId == currentUserId && chat.otherUserId == otherUserId) ||
-            (chat.userId == otherUserId && chat.otherUserId == currentUserId)) {
+        if ((chat.uid == currentUid && chat.otherUid == otherUid) ||
+            (chat.uid == otherUid && chat.otherUid == currentUid)) {
           return chat;
         }
       }
 
       // If no existing chat, create a new one
-      await _chatAPI.createChat(otherUserId);
+      await _chatAPI.createChat(currentUid, otherUid);
 
       // After creating, fetch the chats again to get the new chat's ID and details
-      final updatedChats = await _chatAPI.getUserChats(currentUserId);
+      final updatedChats = await _chatAPI.getUserChats(currentUid);
       for (var chat in updatedChats) {
-         if ((chat.userId == currentUserId && chat.otherUserId == otherUserId) ||
-            (chat.userId == otherUserId && chat.otherUserId == currentUserId)) {
+        if ((chat.uid == currentUid && chat.otherUid == otherUid) ||
+            (chat.uid == otherUid && chat.otherUid == currentUid)) {
           return chat;
         }
       }
       return null; // Should not happen if creation was successful
-
     } catch (e) {
-      // Handle errors (e.g., show a snackbar)
-      print('Error finding or creating chat: $e');
-      return null;
+      state = AsyncValue.error(e, StackTrace.current);
+      rethrow; // Re-throw the exception
     }
   }
 }

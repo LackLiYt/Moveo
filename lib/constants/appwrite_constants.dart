@@ -9,8 +9,11 @@ class AppwriteConstants {
   static const String leaderboardCollectionId = '681b5a350024b878fecd';
 
   // Chat Collections
-  static const String chatsCollectionId = 'chats';
+  static const String chatsCollectionId = '6830bb6c002c797591fa';
   static const String messagesCollectionId = 'messages';
+
+  // Friends Collection
+  static const String friendsCollectionId = '6830bb580031098c87e2';
 
   static const String commentsCollectionId = '682adaf50018719725d6';
   static const String likesCollectionId = '682cabc00000a92b509f';  

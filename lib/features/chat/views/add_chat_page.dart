@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:appwrite/appwrite.dart';
-import 'package:moveo/constants/appwrite_constants.dart';
-import 'package:moveo/features/chat/views/chat_view.dart';
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moveo/features/chat/providers/chat_provider.dart';
 import 'package:moveo/features/auth/controller/auth_controller.dart';
+import 'package:moveo/features/chat/providers/chat_provider.dart';
+import 'package:moveo/models/user_model.dart';
 
 class AddChatPage extends ConsumerStatefulWidget {
   const AddChatPage({super.key});
@@ -15,75 +12,94 @@ class AddChatPage extends ConsumerStatefulWidget {
 }
 
 class _AddChatPageState extends ConsumerState<AddChatPage> {
-  final TextEditingController _searchController = TextEditingController();
-  final Client client = Client()
-    .setEndpoint(AppwriteConstants.endPoint)
-    .setProject(AppwriteConstants.projectId)
-    .setSelfSigned(status: true);
-  late final Databases databases;
-  List<Map<String, dynamic>> _searchResults = [];
   bool _isLoading = false;
-  Timer? _debounce;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    databases = Databases(client);
+    // Removed invalidation from initState
   }
 
-  Future<void> _searchUsers(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-      });
-      return;
-    }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Invalidate the provider to ensure fresh data after dependencies change
+    ref.invalidate(allUsersProvider);
+  }
 
-    // Cancel previous timer if it exists
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
-    // Set new timer
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        final result = await databases.listDocuments(
-          databaseId: AppwriteConstants.databaseId,
-          collectionId: AppwriteConstants.usersCollectionId,
-          queries: [
-            Query.search('name', query),
-            Query.limit(10),
-            Query.orderDesc('name'),
-          ],
-        );
-
-        if (mounted) {
-          setState(() {
-            _searchResults = result.documents.map((doc) => doc.data).toList();
-            _isLoading = false;
-          });
-        }
-      } catch (e) {
-        print('Error searching users: $e');
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error searching users. Please try again.'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
+  Future<void> _startChat(UserModel user) async {
+    setState(() => _isLoading = true);
+    try {
+      final currentUser = await ref.read(currentUserAccountProvider.future);
+      if (currentUser == null) {
+        throw Exception('User not logged in');
       }
-    });
+
+      final chat = await ref.read(chatProvider.notifier).findOrCreateChat(
+        currentUser.$id,
+        user.uid,
+      );
+
+      if (chat != null && mounted) {
+        Navigator.pop(context, chat);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error starting chat: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showStartChatDialog(UserModel user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Start Chat'),
+        content: Text('Do you want to start a chat with ${user.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _startChat(user);
+            },
+            child: const Text('Start Chat'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<UserModel> _filterFriends(List<UserModel> users) {
+    if (_searchQuery.isEmpty) return users;
+    return users.where((user) {
+      final name = user.name.toLowerCase();
+      final query = _searchQuery.toLowerCase();
+      return name.contains(query);
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final allUsersAsync = ref.watch(allUsersProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Chat'),
@@ -95,122 +111,60 @@ class _AddChatPageState extends ConsumerState<AddChatPage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search users by name...',
+                hintText: 'Search friends...',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _searchUsers('');
-                        },
-                      )
-                    : null,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
-              onChanged: _searchUsers,
-              textInputAction: TextInputAction.search,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
             ),
           ),
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: LinearProgressIndicator(),
-            ),
           Expanded(
-            child: _searchResults.isEmpty && !_isLoading
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _searchController.text.isEmpty
-                              ? 'Search for users to start a chat'
-                              : 'No users found',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      final user = _searchResults[index];
-                      final String otherUserId = user['\$id'];
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : allUsersAsync.when(
+                    data: (users) {
+                      final filteredUsers = _filterFriends(users);
                       
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: user['profile_pic'] != null
-                              ? NetworkImage(user['profile_pic'])
-                              : null,
-                          child: user['profile_pic'] == null
-                              ? const Icon(Icons.person)
-                              : null,
-                        ),
-                        title: Text(
-                          user['name'] ?? 'Unknown User',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                      if (filteredUsers.isEmpty) {
+                        return Center(
+                          child: Text(
+                            _searchQuery.isEmpty
+                                ? 'No users found.'
+                                : 'No users found matching "$_searchQuery"',
                           ),
-                        ),
-                        subtitle: Text(
-                          user['email'] ?? '',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        onTap: () async {
-                          final currentUser = await ref.read(currentUserAccountProvider.future);
-                          if (currentUser != null) {
-                            final chat = await ref.read(chatProvider.notifier).findOrCreateChat(currentUser.$id, otherUserId);
-                            if (chat != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ChatView(chat: chat),
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Could not open or create chat.'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please log in to start a chat.'),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                          }
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: filteredUsers.length,
+                        itemBuilder: (context, index) {
+                          final user = filteredUsers[index];
+                          return ListTile(
+                            leading: const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                            title: Text(user.name),
+                            subtitle: Text(user.email),
+                            onTap: () => _showStartChatDialog(user),
+                          );
                         },
                       );
                     },
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (error, stack) => Center(
+                      child: Text('Error loading users: $error'),
+                    ),
                   ),
           ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _debounce?.cancel();
-    super.dispose();
   }
 }

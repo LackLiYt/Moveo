@@ -36,6 +36,36 @@ final getUserDetailsByIdProvider = FutureProvider.family.autoDispose((ref, Strin
   return await ref.watch(userAPIProvider).getUserData(uid);
 });
 
+// Provider to fetch all users excluding the current user
+final allUsersProvider = FutureProvider<List<UserModel>>((ref) async {
+  final userAPI = ref.watch(userAPIProvider);
+  final currentUser = await ref.watch(currentUserAccountProvider.future); // Get current user
+
+  if (currentUser == null) {
+    print("allUsersProvider: Current user is null.");
+    return []; // Return empty list if user is not logged in
+  }
+
+  print("allUsersProvider: Current user ID is ${currentUser.$id}");
+
+  final usersResult = await userAPI.getAllUsers();
+
+  return usersResult.fold(
+    (failure) {
+      print("allUsersProvider: Error fetching users: ${failure.massage}");
+      return []; // Return an empty list in case of failure
+    },
+    (documents) {
+      final allUsers = documents.map((doc) => UserModel.fromMap(doc.data)).toList();
+      print("allUsersProvider: Fetched ${allUsers.length} users.");
+      // Filter out the current user
+      final filteredUsers = allUsers.where((user) => user.uid != currentUser.$id).toList();
+      print("allUsersProvider: Filtered down to ${filteredUsers.length} users.");
+      return filteredUsers;
+    },
+  );
+});
+
 // Create the auth controller provider
 final authControllerProvider = StateNotifierProvider<AuthController, bool>((ref) {
   return AuthController(

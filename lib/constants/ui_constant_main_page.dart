@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
+import 'package:moveo/features/friends/view/friend_list_view.dart';
 
 
 class UiConstants {
@@ -9,7 +10,7 @@ class UiConstants {
       leading: IconButton(
     icon: Icon(Icons.people_alt_outlined),
     onPressed: () {
-      // Your back or custom action here
+      Navigator.push(context, FriendListView.route());
     },
   ),
       centerTitle: true, // Align title to the left
