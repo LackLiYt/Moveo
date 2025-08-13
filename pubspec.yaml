@@ -1,5 +1,5 @@
 name: moveo
-description: "Sigma balls."
+description: "A fitness app that helps people move more in a fun and engaging way."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.1+1
@@ -10,37 +10,53 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  appwrite: ^15.0.2
-  dart_appwrite: ^15.0.0
+  
+  # UI & Design
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.10+1
-  provider: ^6.0.5
-  camera: ^0.11.1
-  fpdart: ^1.1.1
-  flutter_riverpod: ^2.6.1
-  model_viewer_plus: ^1.8.0
   google_fonts: ^6.2.1
-  image_picker: ^1.1.2
   carousel_slider: ^5.0.0
+  
+  # State Management
+  provider: ^6.0.5
+  flutter_riverpod: ^2.6.1
+  
+  # Backend & APIs
+  appwrite: ^17.1.0
+  
+  # Media & Camera
+  camera: ^0.11.1
+  image_picker: ^1.1.2
+  model_viewer_plus: ^1.8.0
+  flutter_3d_controller: ^2.2.0
+  
+  # Chat & Communication
+  flutter_chat_ui: ^1.6.15
+  
+  # Utilities
+  fpdart: ^1.1.1
   timeago: ^3.7.0
+  
+  # Location & Health
   geolocator: ^11.0.0
   health: ^12.1.0
-  flutter_3d_controller: ^2.2.0
-  flutter_chat_ui: ^1.6.15
-
-  # Performance optimization packages
+  
+  # Performance & Caching
   cached_network_image: ^3.3.1
   flutter_cache_manager: ^3.3.1
   shared_preferences: ^2.2.2
+  
+  # App Configuration
   flutter_native_splash: ^2.3.10
   flutter_launcher_icons: ^0.14.3
+  
+  # System & Device
   connectivity_plus: ^6.1.4
   device_info_plus: ^10.1.2
   package_info_plus: ^8.3.0
-  flutter_web_auth_2: ^4.1.0
   permission_handler: ^11.1.0
-
-dependency_overrides:
+  
+  # Authentication
   flutter_web_auth_2: ^4.1.0
 
 dev_dependencies:
@@ -60,6 +76,7 @@ flutter:
     - assets/apple_icon.svg
     - assets/github_icon.svg
     - assets/twitter_icon.svg
+    - assets/logo_icon.svg
     - assets/svgs/
     - assets/global_photos/
     - assets/global_avatars/

@@ -26,7 +26,7 @@ class AppTheme {
       titleMedium: TextStyle(color: Pallete.backgroundColor),
       titleSmall: TextStyle(color: Pallete.backgroundColor),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Pallete.whiteColor,
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -83,7 +83,7 @@ class AppTheme {
       titleMedium: TextStyle(color: Pallete.whiteColor),
       titleSmall: TextStyle(color: Pallete.whiteColor),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Pallete.searchBarColor,
       elevation: 2,
       shape: RoundedRectangleBorder(
