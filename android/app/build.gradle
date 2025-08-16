@@ -7,16 +7,16 @@ plugins {
 
 android {
     namespace "com.example.moveo"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -26,7 +26,7 @@ android {
     defaultConfig {
         applicationId "com.example.moveo"
         minSdkVersion 26
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0.0"
         multiDexEnabled true
@@ -37,6 +37,12 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            // Suppress Java version warnings
+            tasks.withType(JavaCompile) {
+                options.compilerArgs << "-Xlint:-options"
+            }
         }
     }
 }

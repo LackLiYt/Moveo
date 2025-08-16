@@ -5,14 +5,6 @@ import '../../models/friend.dart';
 import '../../features/auth/controller/auth_controller.dart';
 import '../../core/providers.dart';
 
-final clientProvider = Provider<Client>((ref) {
-  // Initialize your Appwrite client here
-  final client = Client()
-    ..setEndpoint('YOUR_APPWRITE_ENDPOINT')
-    ..setProject('YOUR_PROJECT_ID');
-  return client;
-});
-
 final friendServiceProvider = Provider<FriendService>((ref) {
   final client = ref.watch(appwriteClientProvider);
   return FriendService(client);

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:appwrite/appwrite.dart';
-import 'package:moveo/models/chat_model.dart';
-import 'package:moveo/features/chat/controllers/chat_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:appwrite/appwrite.dart';
+import 'package:moveo/constants/appwrite_constants.dart';
+import 'package:moveo/core/providers.dart';
+import 'package:moveo/features/chat/controllers/chat_controller.dart';
 import 'package:moveo/apis/chat_api.dart';
-import 'package:moveo/features/auth/controller/auth_controller.dart';
+import 'package:moveo/models/chat_model.dart';
 
 final chatProvider = StateNotifierProvider<ChatNotifier, AsyncValue<List<ChatModel>>>((ref) {
   return ChatNotifier(
     chatAPI: ref.watch(chatAPIProvider),
   );
+});
+
+final chatControllerProvider = ChangeNotifierProvider<ChatProvider>((ref) {
+  final client = ref.watch(appwriteClientProvider);
+  return ChatProvider(client: client);
 });
 
 final chatMessagesProvider = StreamProvider.family<List<ChatMessage>, String>((ref, chatId) async* {
@@ -108,7 +114,10 @@ class ChatNotifier extends StateNotifier<AsyncValue<List<ChatModel>>> {
 }
 
 class ChatProvider extends ChangeNotifier {
-  final ChatController _chatController = ChatController();
+  final ChatController _chatController;
+  
+  ChatProvider({required Client client}) : _chatController = ChatController(client: client);
+  
   Map<String, List<ChatData>>? _chats;
   bool _isLoading = false;
 

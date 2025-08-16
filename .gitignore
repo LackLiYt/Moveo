@@ -143,3 +143,4 @@ fastlane/test_output
 *.tmp
 *.temp
 *.cache
+*.md

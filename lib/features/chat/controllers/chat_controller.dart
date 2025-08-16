@@ -3,18 +3,14 @@ import 'package:moveo/constants/appwrite_constants.dart';
 import 'package:moveo/models/chat_model.dart';
 
 class ChatController {
-  final Client client = Client()
-    .setEndpoint(AppwriteConstants.endPoint)
-    .setProject(AppwriteConstants.projectId)
-    .setSelfSigned(status: true);
-
+  final Client client;
   late final Account account;
   late final Databases databases;
   late final Storage storage;
   late final Realtime realtime;
   RealtimeSubscription? subscription;
 
-  ChatController() {
+  ChatController({required this.client}) {
     account = Account(client);
     databases = Databases(client);
     storage = Storage(client);

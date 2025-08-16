@@ -31,15 +31,15 @@ dependencies:
   flutter_3d_controller: ^2.2.0
   
   # Chat & Communication
-  flutter_chat_ui: ^1.6.15
+  flutter_chat_ui: ^2.9.0
   
   # Utilities
   fpdart: ^1.1.1
   timeago: ^3.7.0
   
   # Location & Health
-  geolocator: ^11.0.0
-  health: ^12.1.0
+  geolocator: ^14.0.2
+  health: ^13.1.1
   
   # Performance & Caching
   cached_network_image: ^3.3.1
@@ -54,7 +54,7 @@ dependencies:
   connectivity_plus: ^6.1.4
   device_info_plus: ^10.1.2
   package_info_plus: ^8.3.0
-  permission_handler: ^11.1.0
+  permission_handler: ^12.0.1
   
   # Authentication
   flutter_web_auth_2: ^4.1.0
@@ -62,7 +62,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_driver:
     sdk: flutter
   integration_test:
