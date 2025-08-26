@@ -1,31 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moveo/constants/assets_constants.dart';
-import 'package:moveo/features/auth/widgets/moveo_title.dart';
+import 'package:moveo/features/chat/views/chat_page_view.dart';
 
 class UiConstants {
-  static AppBar appBar() {
+  static AppBar appBar(BuildContext context) {
     return AppBar(
-      title: Text('moveo', style: GoogleFonts.montserrat(color: const Color(0xFF0437F2), fontWeight: FontWeight.bold, fontSize: 35 )),
-      leading: const Icon(Icons.people, size: 35, weight: 2,),
+      centerTitle: true, // Align title to the left
+      title: SvgPicture.asset(
+        // Dynamically choose the title asset based on the theme
+        Theme.of(context).brightness == Brightness.light
+            ? AssetsConstants.MoveoTitleBlue
+            : AssetsConstants.MoveoTitleBlack,
+        height: 24, // Make the title smaller
+      ),
       actions: [
-        //comments
-        Icon(Icons.comment),
-        //notifications
-        Icon(Icons.notifications),
+        IconButton(
+          icon: Icon(
+            Icons.chat_bubble_outline,
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.black
+                : Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const ChatPageView(),
+            ));
+          },
+        ),
+        const SizedBox(width: 8), // Add some padding
       ],
-
-
-
-      
-      centerTitle: true,
-      
-
-      
-      
-      
-      );
-    
+    );
   }
 }
